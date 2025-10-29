@@ -1,0 +1,37 @@
+{
+  "name": "test_prj",
+  "version": "1.0.0",
+  "description": "first web prj",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec babel-node src/server.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.3",
+    "@babel/node": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "mysql2": "^3.14.1",
+    "nodemailer": "^7.0.6",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
+    "sequelize": "^6.37.7"
+  }
+}

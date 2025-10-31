@@ -1,15 +1,6 @@
 version: "3.9"
 
 services:
-  redis:
-    image: redis:7-alpine
-    restart: always
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   app:
     build: .
     ports:
@@ -18,10 +9,6 @@ services:
       - .env
     environment:
       - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./src/public:/usr/src/app/src/public
-    depends_on:
-      redis:
-        condition: service_healthy
+
 
 

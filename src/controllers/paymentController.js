@@ -1,6 +1,7 @@
+import payment from "../models/payment.js";
 import billServices from "../services/baseService/billService.js";
 import paymentServices from "../services/baseService/paymentService.js";
-let handleCreateBill = async (req, res) => {
+let handleCreatePayment = async (req, res) => {
   try {
     let household_id = req.user.household_id;
     let bill_id = req.body.bill_id;
@@ -14,11 +15,8 @@ let handleCreateBill = async (req, res) => {
     );
     return res.status(200).json({
       status: 200,
-      message: "create bill success",
-      data: {
-        name: name,
-        last_date: last_date,
-      },
+      message: "create payment success",
+      data: payment,
     });
   } catch (e) {
     console.error(e);

@@ -2,7 +2,7 @@ import db from "../models/index.js";
 import authServices from "./authServices.js";
 
 async function createHousehold(room, number_motobike, number_car, start_date) {
-  let creator = authServices.findUserByID(user);
+  let creator = await authServices.findUserByID(user);
 
   const newHousehold = await db.Household.create({
     room,

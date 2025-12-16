@@ -2,11 +2,10 @@ import db from "../../models/index.js";
 import authServices from "./authServices.js";
 
 async function createNewBill(creatorId, name, last_date, based = null) {
-  let creator = authServices.findUserByID(creatorId);
+  let creator = await authServices.findUserByID(creatorId);
   const newBill = await db.Bill.create({
     name: name,
     apartment_id: creator.apartment_id,
-    phonenumber: newUserData.phonenumber,
     based: based,
     start_date: new Date(),
     last_date: new Date(last_date),

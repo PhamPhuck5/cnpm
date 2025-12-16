@@ -44,10 +44,9 @@ async function findGeneralInfoByID(id) {
   return movie;
 }
 async function findUserByID(id) {
-  const movie = await db.User.findOne({
+  return await db.User.findOne({
     where: { id: id },
   });
-  return movie;
 }
 async function findUserByEmail(email) {
   const user = await db.User.findOne({ where: { email } });

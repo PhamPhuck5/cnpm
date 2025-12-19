@@ -12,3 +12,5 @@ Thumbs.db
 *.tsbuildinfo
 .vscode/
 server-app.tar
+
+.prettierrc

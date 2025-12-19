@@ -27,6 +27,11 @@ export default (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      area: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0.0,
+      },
     },
     {
       sequelize,

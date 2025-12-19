@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "Apartment Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"123456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/login" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apartments",
+      "item": [
+        {
+          "name": "Get All Apartments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/apartments" }
+          }
+        },
+        {
+          "name": "Create Apartment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Chung cư ABC\",\n    \"address\": \"Số 1 Hà Nội\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/apartments" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Households",
+      "item": [
+        {
+          "name": "Get My Households",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/households" }
+          }
+        },
+        {
+          "name": "Get Household Details",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/households/1" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bills",
+      "item": [
+        {
+          "name": "Get Bills of My Apartment",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/bills/my-apartment" }
+          }
+        },
+        {
+          "name": "Get Bill Stats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/payments/stats/1" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Humans",
+      "item": [
+        {
+          "name": "Get Humans in Household",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/humans/household/1" }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": { "type": "text/javascript", "exec": [""] }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

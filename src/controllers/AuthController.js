@@ -16,6 +16,7 @@ let handleLoggin = async (req, res) => {
       status: userData.code,
       message: userData.message,
       data: userData.code === 200 ? userData : null,
+      accessToken: userData.accessToken,
     });
   } catch (e) {
     console.error(e);
@@ -28,12 +29,13 @@ let handleLoggin = async (req, res) => {
 
 let handleRegister = async (req, res) => {
   try {
+    console.log(">>> Check Body:", req.body);
     let newUserData = {
       name: req.body.name,
       phonenumber: req.body.phonenumber,
       email: req.body.email,
       password: req.body.password,
-      apartment_id: req.body.apartmentId,
+      apartmentId: req.body.apartmentId,
     };
 
     if (
@@ -57,7 +59,7 @@ let handleRegister = async (req, res) => {
       message: result.message,
     });
   } catch (e) {
-    console.error(e);
+    console.log(e);
     return res.status(500).json({
       status: 500,
       message: "Server error",
@@ -102,3 +104,4 @@ const authControler = {
   changePassword: changePassword,
 };
 export default authControler;
+//todo: thêm quên mật khẩu, đổi mật khẩu

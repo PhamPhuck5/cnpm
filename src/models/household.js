@@ -8,6 +8,9 @@ export default (sequelize) => {
       this.hasMany(models.Payment, {
         foreignKey: "household_id",
       });
+      this.hasMany(models.Human, {
+        foreignKey: "household_id",
+      });
       this.belongsTo(models.Apartment, {
         foreignKey: "apartment_id",
       });
@@ -17,7 +20,16 @@ export default (sequelize) => {
   Household.init(
     {
       room: {
+        //todo: add index this and apartment_id
         type: DataTypes.STRING(8),
+        allowNull: false,
+      },
+      type: {
+        type: DataTypes.STRING(32),
+        allowNull: false,
+      },
+      feePerMeter: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       number_motobike: {

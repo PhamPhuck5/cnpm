@@ -8,5 +8,14 @@ async function createNewApartment(name, address) {
   return newApartment;
 }
 
-const apartmentServices = { createNewApartment: createNewApartment };
+async function getAllApartments() {
+  return await db.Apartment.findAll({
+    attributes: ["id", "name", "address", "area"],
+  });
+}
+
+const apartmentServices = { 
+  createNewApartment: createNewApartment ,
+  getAllApartments: getAllApartments
+};
 export default apartmentServices;

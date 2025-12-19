@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import initWebRouter from "./route/web.js";
+import initWebRouter from "./route/index.js";
 import { checkConnection } from "./config/connectDB.js";
 import db from "./models/index.js";
 import corsPolicy from "./config/corsConfig.js";
@@ -32,3 +32,32 @@ let port = process.env.PORT || 6999;
 app.listen(port, "0.0.0.0", () => {
   console.log("Server running on port:" + port);
 });
+
+// const app = express();
+
+// async function startApp() {
+//   try {
+//     console.log("start server init...");
+//     await checkConnection(db.sequelize);
+
+//     await db.sequelize.sync({ alter: true });
+//     console.log("Database synchronized");
+
+//     app.use(corsPolicy);
+//     app.use(bodyParser.json());
+//     app.use(bodyParser.urlencoded({ extended: true }));
+
+//     initWebRouter(app);
+//     app.use(limiter);
+
+//     const port = process.env.PORT || 6999;
+//     app.listen(port, "0.0.0.0", () => {
+//       console.log("Server running on port:" + port);
+//     });
+//   } catch (error) {
+//     console.error("Error starting the server:", error);
+//     process.exit(1);
+//   }
+// }
+
+// startApp();

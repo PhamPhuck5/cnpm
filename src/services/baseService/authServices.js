@@ -35,35 +35,28 @@ async function createNewUser(newUserData) {
   return newUser;
 }
 
-async function findGeneralInfoByID(id) {
-  const movie = await db.User.findOne({
-    where: { id: id },
-    attributes: ["name"],
-    raw: true,
-  });
-  return movie;
-}
 async function findUserByID(id) {
   return await db.User.findOne({
     where: { id: id },
   });
 }
+
 async function findUserByEmail(email) {
   const user = await db.User.findOne({ where: { email } });
   return user;
 }
+
 let requestIsLegit = (email, password) => {
   return email.length >= 8 && email[0] != " " && password.length >= 8;
 };
+
 async function handleLogin(email, password) {
   let returnData = {};
 
   let userID = await checkLogin(email, password);
   if (userID) {
-    returnData = await findGeneralInfoByID(userID);
-    returnData.accessToken = await generateAccessToken({
-      id: userID,
-    });
+    returnData = await findUserByID(userID);
+    returnData.accessToken = generateAccessToken({ id: userID });
     returnData.code = 200;
     returnData.message = "login success";
   } else {
@@ -74,27 +67,29 @@ async function handleLogin(email, password) {
 }
 
 async function handleRegister(newUserData) {
+  console.log("1");
   let existEmail = await checkEmail(newUserData.email);
   let returnData = {};
+  console.log("2");
+
   if (existEmail) {
     returnData.code = 401;
     returnData.message = "user already exist";
     return returnData;
   }
+  console.log("3");
+
   await createNewUser(newUserData);
   returnData.code = 200;
   returnData.message = "user created";
   return returnData;
 }
+
 async function changePassword(email, newPassword) {
   const user = await findUserByEmail(email);
   const length = 10;
   if (!newPassword) {
-    let Password = crypto
-      .randomBytes(length)
-      .toString("base64")
-      .replace(/[+/=]/g, "")
-      .substr(0, length);
+    let Password = crypto.randomBytes(length).toString("base64").replace(/[+/=]/g, "").substr(0, length);
 
     user.password = await bcrypt.hash(Password, saltRounds);
     await user.save();
@@ -103,6 +98,13 @@ async function changePassword(email, newPassword) {
     user.password = await bcrypt.hash(newPassword, saltRounds);
     await user.save();
   }
+}
+//quản lý nhân khẩu
+async function getUsersByApartment(apartmentId) {
+  return await db.User.findAll({
+    where: { apartment_id: apartmentId },
+    attributes: ["id", "name", "email", "phonenumber"],
+  });
 }
 
 const authServices = {
@@ -113,5 +115,6 @@ const authServices = {
   createNewUser: createNewUser,
   changePassword: changePassword,
   requestIsLegit: requestIsLegit,
+  getUsersByApartment: getUsersByApartment,
 };
 export default authServices;

@@ -1,13 +1,13 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
-
+import configFile from "../config.js";
 dotenv.config();
 
-const sequelize = new Sequelize("test_db", "root", process.env.DB_PASSWORD, {
-  host: "host.docker.internal",
-  dialect: "mysql",
-});
+const env = process.env.NODE_ENV || "development";
+const config = configFile[env];
+console.log(config.database, config.username, config.password);
 
+const sequelize = new Sequelize(config.database, config.username, config.password, config);
 export const checkConnection = async () => {
   try {
     await sequelize.authenticate();

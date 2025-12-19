@@ -16,7 +16,7 @@ export default {
   test: {
     username: "root",
     password: process.env.DB_PASSWORD,
-    database: "test_db",
+    database: "cnpm_test_db",
     host: "127.0.0.1",
     dialect: "mysql",
     logging: false,
@@ -34,4 +34,7 @@ export default {
       multipleStatements: true,
     },
   },
+};
+export const CONFIG_VALUE = {
+  MAX_TASK_LENGTH_MINUTES: 23 * 60,
 };

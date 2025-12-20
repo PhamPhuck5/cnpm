@@ -303,6 +303,16 @@
 				{
 					"name": "xem khoản thu những ai đã đóng",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MjQ1NzM3LCJleHAiOjE3NjYyNjczMzd9.SeJ-Crqslomd9S0xRRMKGQf5dg1k1HoNTVBz3eLjGGw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -325,11 +335,21 @@
 				{
 					"name": "Tạo phiếu thanh toán",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"bill_id\": 1,\n    \"amount\": 500000\n}",
+							"raw": "{\n    \"household_id\": 1,\n    \"bill_id\": 1,\n    \"amount\": 500000\n}",
 							"options": {
 								"raw": {
 									"language": "json"

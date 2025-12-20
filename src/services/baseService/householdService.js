@@ -38,11 +38,8 @@ async function getHouseholdDetails(id) {
     include: [{ model: db.Apartment }, { model: db.Apartment }, { model: db.Human }],
   });
 }
-async function findHouseholdByUser(userId) {
-  let user = await authServices.findUserByID(userId);
 
-  return user.apartment_id;
-}
+export const findHouseholdByUser = getAllHouseholds;
 const householdServices = {
   createHousehold: createHousehold,
   getAllHouseholds: getAllHouseholds,

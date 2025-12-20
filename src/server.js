@@ -20,9 +20,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 initWebRouter(app);
 
 checkConnection();
-db.sequelize.authenticate();
-// await db.sequelize.sync({ alter: true });
-await db.sequelize.sync();
+// db.sequelize.authenticate();
+await db.sequelize.sync({ alter: true });
+// await db.sequelize.sync();
 console.log("finish working on connect db");
 
 app.use(limiter);

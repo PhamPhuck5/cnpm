@@ -1,4 +1,5 @@
 import db from "../../models/index.js";
+import authServices from "./authServices.js";
 
 async function createNewApartment(name, address) {
   const newApartment = await db.Apartment.create({
@@ -14,8 +15,14 @@ async function getAllApartments() {
   });
 }
 
-const apartmentServices = { 
-  createNewApartment: createNewApartment ,
-  getAllApartments: getAllApartments
+export async function getApartmentByUser(userId) {
+  let user = await authServices.findUserByID(userId);
+
+  return user.apartment_id;
+}
+
+const apartmentServices = {
+  createNewApartment: createNewApartment,
+  getAllApartments: getAllApartments,
 };
 export default apartmentServices;

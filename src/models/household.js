@@ -19,6 +19,10 @@ export default (sequelize) => {
 
   Household.init(
     {
+      apartment_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       room: {
         //todo: add index this and apartment_id
         type: DataTypes.STRING(8),
@@ -28,6 +32,11 @@ export default (sequelize) => {
         type: DataTypes.STRING(32),
         allowNull: false,
       },
+      area: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0.0,
+      },
       feePerMeter: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -35,10 +44,6 @@ export default (sequelize) => {
       number_motobike: {
         type: DataTypes.TINYINT,
         allowNull: true,
-      },
-      apartment_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
       },
       number_car: {
         type: DataTypes.TINYINT,

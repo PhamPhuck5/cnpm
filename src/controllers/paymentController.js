@@ -5,8 +5,10 @@ let handleCreatePayment = async (req, res) => {
   try {
     let bill_id = req.body.bill_id;
     let amount = req.body.amount;
+    let householdId = req.body.household_id;
+
     let collector = req.user.id;
-    let newPayment = await paymentServices.createPayment(bill_id, amount, collector);
+    let newPayment = await paymentServices.createPayment(bill_id, amount, collector, householdId);
     return res.status(200).json({
       status: 200,
       message: "create payment success",
@@ -24,17 +26,17 @@ let handleCreatePayment = async (req, res) => {
 let handleGetAllPaymentByBill = async (req, res) => {
   try {
     const { billId } = req.params;
-
+    const userId = req.user.id;
     if (!(await billServices.checkPermission(billId, req.user.id))) {
       return res.status(403).json({
         status: 403,
         message: "you don't have permission to access this content",
       });
     }
-    let listPayment = await paymentServices.getAllPaymentByBill(billId);
+    let listPayment = await paymentServices.getPaidStatusByBill(billId, userId);
     return res.status(200).json({
       status: 200,
-      message: "create bill success",
+      message: "get payments by bill success",
       data: listPayment,
     });
   } catch (e) {

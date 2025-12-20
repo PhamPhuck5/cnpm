@@ -13,7 +13,7 @@ async function createNewBill(creatorId, name, last_date, based = null) {
   });
   return newBill;
 }
-async function findBillByID(id, userId) {
+export async function findBillByID(id, userId) {
   if (!(await checkPermission(id, userId))) {
     throw new error("not permission");
   }
@@ -31,8 +31,13 @@ async function checkPermission(billId, userId) {
   if (!(bill && user)) {
     throw new Error("not found bill or user, on testing if you see this create a bill before find it oke");
   }
-  console.log(bill.apartment_id, user.apartment_id);
   return bill.apartment_id == user.apartment_id;
+}
+export async function getBillsByApartment(apartmentId) {
+  return db.Bill.findAll({
+    where: { apartment_id: apartmentId },
+    raw: true,
+  });
 }
 
 async function getAllBillsOfApartment(userId) {
@@ -55,7 +60,6 @@ async function getAllBillsOfApartment(userId) {
 }
 const billServices = {
   createNewBill: createNewBill,
-  findBillByID: findBillByID,
   getAllBillsOfApartment: getAllBillsOfApartment,
   checkPermission: checkPermission,
 };

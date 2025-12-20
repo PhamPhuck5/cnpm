@@ -16,7 +16,14 @@ export default (sequelize) => {
       });
     }
   }
-
+  /**
+   * currently, base have these type:
+  voluntary: "voluntary",
+  fixed: "fixed",
+  motorcycle: "motorcycle",
+  car: "car",
+  area: "area",
+   */
   Bill.init(
     {
       name: {
@@ -26,6 +33,11 @@ export default (sequelize) => {
       apartment_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      //payment = amount * based,
+      amount: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       based: {
         type: DataTypes.STRING(16),

@@ -39,11 +39,28 @@ async function getHouseholdDetails(id) {
   });
 }
 
+async function getHouseholdByRoom(room, userId) {
+  const user = await db.User.findByPk(userId);
+
+  return await db.Household.findAll({
+    where: {
+      apartment_id: user.apartment_id,
+      room: room,
+    },
+    include: [
+      {
+        model: db.Apartment,
+      },
+    ],
+  });
+}
+
 export const findHouseholdByUser = getAllHouseholds;
 const householdServices = {
   createHousehold: createHousehold,
   getAllHouseholds: getAllHouseholds,
   getHouseholdDetails: getHouseholdDetails,
   findHouseholdByUser: findHouseholdByUser,
+  getHouseholdByRoom,
 };
 export default householdServices;

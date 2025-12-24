@@ -12,6 +12,17 @@ async function createAbsent(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+async function endAbsentHandler(req, res) {
+  try {
+    const { humanId, start_date, last_date } = req.body;
+
+    const absent = await absentService.endAbsent(humanId, start_date, last_date);
+
+    return res.status(201).json(absent);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 async function getAbsentsByHousehold(req, res) {
   try {
@@ -48,4 +59,5 @@ export default {
   createAbsent,
   getAbsentsByHousehold,
   getAllAbsentsByHousehold,
+  endAbsentHandler,
 };

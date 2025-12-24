@@ -44,6 +44,25 @@ const handleGetAllHouseholds = async (req, res) => {
     });
   }
 };
+const handleGetHouseholdByRoom = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { roomName } = req.params;
+
+    const households = await householdServices.getHouseholdByRoom(roomName, userId);
+
+    return res.status(200).json({
+      message: "Get households success",
+      data: households,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 
 const handleGetHouseholdDetails = async (req, res) => {
   try {
@@ -76,4 +95,5 @@ export default {
   handleCreateHousehold,
   handleGetAllHouseholds,
   handleGetHouseholdDetails,
+  handleGetHouseholdByRoom,
 };

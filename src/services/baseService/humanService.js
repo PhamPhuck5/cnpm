@@ -1,6 +1,6 @@
 // services/humanService.js
 import db from "../../models/index.js";
-
+import { getApartmentByUser } from "./apartmentService.js";
 async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {
   return await db.Human.create({
     household_id,
@@ -51,6 +51,26 @@ async function getLivingByHousehold(household_id) {
     order: [["id", "ASC"]],
   });
 }
+async function getHumanByName(name, userId) {
+  const apartmentId = await getApartmentByUser(userId);
+  return Human.findAll({
+    where: {
+      name: {
+        [Op.like]: `%${name}%`,
+      },
+    },
+    include: [
+      {
+        model: Household,
+        required: true,
+        where: {
+          apartment_id: apartmentId,
+        },
+        attributes: ["id", "room", "apartment_id"],
+      },
+    ],
+  });
+}
 
 export default {
   createHuman,
@@ -58,4 +78,5 @@ export default {
   setLivingTrue,
   getAllByHousehold,
   getLivingByHousehold,
+  getHumanByName,
 };

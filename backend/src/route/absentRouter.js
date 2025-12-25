@@ -8,6 +8,7 @@ let initAbsentRouter = (app) => {
   router.post("/api/absents", authMiddleware, absentController.createAbsent);
   router.get("/api/absents/household/:householdId", authMiddleware, absentController.getAllAbsentsByHousehold);
   router.get("/api/absents/household/:householdId/filter", authMiddleware, absentController.getAbsentsByHousehold);
+  router.post("/api/absents/end", authMiddleware, absentController.endAbsentHandler);//     const { humanId, start_date, last_date } = req.body;
 
   return app.use("/", router);
 };

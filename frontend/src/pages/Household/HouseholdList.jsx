@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMyHouseholds } from '../../api/householdService';
+import { getAllHouseholds } from '../../api/managementService';
 import { Link } from 'react-router-dom';
 
 const HouseholdList = () => {
@@ -12,7 +12,7 @@ const HouseholdList = () => {
 
     const loadData = async () => {
         try {
-            const res = await getMyHouseholds();
+            const res = await getAllHouseholds();
             console.log("Dữ liệu danh sách hộ:", res); // Log để kiểm tra cấu trúc
 
             // Dựa vào Controller backend bạn cung cấp: return res.status(200).json({ data: households })
@@ -96,7 +96,7 @@ const HouseholdList = () => {
 
                                             {/* 4. Số xe máy */}
                                             <td className="px-5 py-4 text-sm text-center text-gray-700 font-medium">
-                                                {h.number_motobike}
+                                                {h.number_motobike ?? 0}
                                             </td>
 
                                             {/* 5. Số ô tô */}

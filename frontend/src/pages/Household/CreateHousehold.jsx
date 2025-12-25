@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { createHousehold } from '../../api/householdService'; 
+import { createHousehold } from '../../api/managementService'; 
 import { useNavigate } from 'react-router-dom';
 
 const CreateHousehold = () => {
     const navigate = useNavigate();
 
     const [apartmentId, setApartmentId] = useState('');
-    const [countMotorbike, setCountMotorbike] = useState(0);
+    const [countMotobike, setCountMotobike] = useState(0);
     const [countCar, setCountCar] = useState(0);
 
     const [type, setType] = useState('Chung cư'); // Mặc định
@@ -34,7 +34,7 @@ const CreateHousehold = () => {
         try {
             const payload = {
                 room: parseInt(apartmentId), 
-                number_motorbike: parseInt(countMotorbike),
+                number_motobike: parseInt(countMotobike),
                 number_car: parseInt(countCar),
                 start_date: new Date(),
                 type: type,                  
@@ -55,7 +55,7 @@ const CreateHousehold = () => {
 
     return (
         <div className="p-6 bg-white rounded shadow-md max-w-lg mx-auto mt-10">
-            <h2 className="text-2xl font-bold mb-4 text-blue-600">Thêm Hộ Khẩu Mới</h2>
+            <h2 ctlassName="text-2xl font-bold mb-4 text-blue-600">Thêm Hộ Khẩu Mới</h2>
             <form onSubmit={handleSubmit}>
                 
                 {/* Ô nhập Số phòng (Apartment ID) */}
@@ -107,8 +107,8 @@ const CreateHousehold = () => {
                         <input 
                             type="number"
                             className="w-full border p-2 rounded"
-                            value={countMotorbike}
-                            onChange={(e) => setCountMotorbike(e.target.value)}
+                            value={countMotobike}
+                            onChange={(e) => setCountMotobike(e.target.value)}
                         />
                     </div>
                     <div className="w-1/2">

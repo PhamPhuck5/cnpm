@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getHouseholdDetail } from '../../api/householdService';
-import { getAllResidents, addResident, markAsLeave, markAsLiving } from '../../api/residentService';
+import { getHouseholdDetail } from '../../api/managementService';
+import { getAllResidentsInHousehold, addResident, markAsLeave, markAsLiving } from '../../api/managementService';
 
 const HouseholdDetail = () => {
     const { id } = useParams();
@@ -29,7 +29,7 @@ const HouseholdDetail = () => {
 
     // Khi danh sách gốc hoặc chế độ xem thay đổi -> Cập nhật danh sách hiển thị
     useEffect(() => {
-        if (showHistory) {
+        if (!showHistory) {
             setFilteredResidents(residents); // Xem tất cả
         } else {
             // Chỉ xem người có status là 'living' hoặc is_living = true (tùy backend trả về)
@@ -42,7 +42,7 @@ const HouseholdDetail = () => {
         try {
             const [resHouse, resRes] = await Promise.all([
                 getHouseholdDetail(id),
-                getAllResidents(id)
+                getAllResidentsInHousehold(id)
             ]);
             setHousehold(resHouse.data?.data || resHouse.data);
             setResidents(resRes.data || []);
@@ -178,25 +178,25 @@ const HouseholdDetail = () => {
                                     </td>
                                     <td className="px-5 py-4 text-center">
                                         {isLiving ? (
-                                            <span className="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded-full">Đang ở</span>
+                                            <span className="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded-full">Tạm vắng</span>
                                         ) : (
-                                            <span className="text-red-500 font-bold text-xs bg-red-100 px-2 py-1 rounded-full">Tạm vắng</span>
+                                            <span className="text-red-500 font-bold text-xs bg-red-100 px-2 py-1 rounded-full">Đang ở</span>
                                         )}
                                     </td>
                                     <td className="px-5 py-4 text-center">
                                         {isLiving ? (
                                             <button 
-                                                onClick={() => handleStatusChange(r.id, true)}
+                                                onClick={() => handleStatusChange(r.id, false)}
                                                 className="text-red-500 hover:text-red-700 text-xs font-medium border border-red-200 hover:bg-red-50 px-3 py-1 rounded"
                                             >
-                                                Báo Tạm Vắng
+                                                Huỷ Tạm Vắng
                                             </button>
                                         ) : (
                                             <button 
-                                                onClick={() => handleStatusChange(r.id, false)}
+                                                onClick={() => handleStatusChange(r.id, true)}
                                                 className="text-green-600 hover:text-green-800 text-xs font-medium border border-green-200 hover:bg-green-50 px-3 py-1 rounded"
                                             >
-                                                Hủy Tạm Vắng
+                                                Báo Tạm Vắng 
                                             </button>
                                         )}
                                     </td>

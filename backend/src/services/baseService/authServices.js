@@ -99,13 +99,6 @@ async function changePassword(email, newPassword) {
     await user.save();
   }
 }
-//quản lý nhân khẩu
-async function getUsersByApartment(apartmentId) {
-  return await db.User.findAll({
-    where: { apartment_id: apartmentId },
-    attributes: ["id", "name", "email", "phonenumber"],
-  });
-}
 
 const authServices = {
   handleLogin: handleLogin,
@@ -115,6 +108,5 @@ const authServices = {
   createNewUser: createNewUser,
   changePassword: changePassword,
   requestIsLegit: requestIsLegit,
-  getUsersByApartment: getUsersByApartment,
 };
 export default authServices;

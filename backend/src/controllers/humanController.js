@@ -53,6 +53,19 @@ async function getAllByHousehold(req, res) {
   }
 }
 
+async function getByName(req, res) {
+  try {
+    const { name } = req.params;
+    const userId = req.user.id;
+
+    const humans = await humanService.getHumanByName(name, userId);
+
+    return res.json({data: humans});
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 async function getLivingByHousehold(req, res) {
   try {
     const { householdId } = req.params;
@@ -71,4 +84,5 @@ export default {
   setLivingTrue,
   getAllByHousehold,
   getLivingByHousehold,
+  getByName,
 };

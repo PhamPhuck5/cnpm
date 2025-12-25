@@ -52,10 +52,32 @@ async function getLivingByHousehold(household_id) {
   });
 }
 
+async function getHumanByName(name, userId) {
+  const apartmentId = await getApartmentByUser(userId);
+  return Human.findAll({
+    where: {
+      name: {
+        [Op.like]: `%${name}%`,
+      },
+    },
+    include: [
+      {
+        model: Household,
+        required: true,
+        where: {
+          apartment_id: apartmentId,
+        },
+        attributes: ["id", "room", "apartment_id"],
+      },
+    ],
+  });
+}
+
 export default {
   createHuman,
   setLivingFalse,
   setLivingTrue,
   getAllByHousehold,
   getLivingByHousehold,
+  getHumanByName,
 };

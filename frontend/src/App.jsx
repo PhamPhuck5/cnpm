@@ -1,21 +1,15 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-
-// Import Layout
 import MainLayout from './components/MainLayout';
-
-// Import các trang Auth
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-
-// Import các trang Nghiệp vụ
-import HouseholdList from './pages/Household/HouseholdList';
-import HouseholdDetail from './pages/Household/HouseholdDetail';
+import Dashboard from './pages/Statistics/index'; 
+import SearchCenter from './pages/SearchCenter/index'; 
+import HouseholdList from './pages/Household/HouseholdList'; 
 import CreateHousehold from './pages/Household/CreateHousehold';
-import CreateBill from './pages/Fees/CreateBill';
-import Payment from './pages/Fees/Payment';
-
-// Component bảo vệ Route (Chưa đăng nhập -> Đá về Login)
+import HouseholdDetail from './pages/Household/HouseholdDetail';
+import BillList from './pages/Finance/BillList';
+import CreateBill from './pages/Finance/CreateBill';
 const ProtectedRoute = () => {
     const token = localStorage.getItem('token');
     return token ? <Outlet /> : <Navigate to="/login" replace />;
@@ -25,28 +19,33 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* --- ROUTE CÔNG KHAI (Không cần đăng nhập) --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* --- ROUTE RIÊNG TƯ (Cần đăng nhập) --- */}
         <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
-                {/* Mặc định vào trang households */}
-                <Route path="/" element={<Navigate to="/households" replace />} />
                 
-                {/* Nhóm Hộ Khẩu */}
+                {/* 1. Dashboard (Mặc định) */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+
+                {/* 2. Module Tra Cứu */}
+                <Route path="/search" element={<SearchCenter />} />
+
+                {/* 3. Module Quản Lý */}
                 <Route path="/households" element={<HouseholdList />} />
                 <Route path="/households/create" element={<CreateHousehold />} />
                 <Route path="/households/:id" element={<HouseholdDetail />} />
 
-                {/* Nhóm Thu Phí */}
+                {/* 4. Module Tài Chính */}
                 <Route path="/fees/create-bill" element={<CreateBill />} />
-                <Route path="/fees/payment" element={<Payment />} />
+                <Route path="/finance/bills" element={<BillList />} />
+                {/* <Route path="/finance/create" element={<CreateBill />} /> */}
+
             </Route>
         </Route>
 
-        {/* Xử lý đường dẫn linh tinh -> Về Login */}
+        {/* 404 Route */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

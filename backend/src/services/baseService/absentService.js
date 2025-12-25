@@ -10,6 +10,21 @@ async function createAbsent(humanId, start_date, last_date) {
   });
 }
 
+async function endAbsent(humanId, start_date, last_date) {
+  let lastDate = last_date ? new Date(last_date) : new Date();
+  return await db.Absent.update(
+    {
+      last_date: lastDate,
+    },
+    {
+      where: {
+        humanId,
+        start_date,
+      },
+    }
+  );
+}
+
 /**
  * by defaulse this func return 10 latest absents
  * @param {*} householdId
@@ -54,4 +69,5 @@ export default {
   createAbsent,
   getAbsentsByHousehold,
   getAllAbsentsByHousehold,
+  endAbsent,
 };

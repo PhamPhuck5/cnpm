@@ -24,7 +24,13 @@ await checkConnection();
 
 // Đồng bộ database (Tạo bảng nếu chưa có)
 // alter: true giúp sửa bảng nếu model thay đổi
-await db.sequelize.sync({ alter: true });
+db.sequelize.sync({ alter: true }).then(() => {
+  console.log("Alter sync db.");
+});
+// Sửa thành force: false (hoặc bỏ trống cũng được vì mặc định là false)
+// db.sequelize.sync({ force: false }).then(() => {
+//   console.log("Re-sync db.");
+// });
 console.log("Finish working on connect db");
 
 app.use(limiter);

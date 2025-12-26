@@ -30,5 +30,6 @@ export async function getApartmentInfoForUser(userId) {
 const apartmentServices = {
   createNewApartment: createNewApartment,
   getAllApartments: getAllApartments,
+  getApartmentByUser: getApartmentByUser,
 };
 export default apartmentServices;

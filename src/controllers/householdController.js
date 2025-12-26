@@ -45,12 +45,49 @@ const handleGetAllHouseholds = async (req, res) => {
     });
   }
 };
+const handleGetAllLivingHouseholds = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const households = await householdServices.getAllLivingHouseholds(userId);
+
+    return res.status(200).json({
+      message: "Get households success",
+      data: households,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 const getLivingHouseholdByRoom = async (req, res) => {
   try {
     const userId = req.user.id;
     const { roomName } = req.params;
 
     const households = await householdServices.getLivingHouseholdByRoom(roomName, userId);
+
+    return res.status(200).json({
+      message: "Get households success",
+      data: households,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+const handleGetHouseholdsByRoom = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { roomName } = req.params;
+
+    const households = await householdServices.getHouseholdsByRoom(roomName, userId);
 
     return res.status(200).json({
       message: "Get households success",
@@ -91,10 +128,37 @@ const handleGetHouseholdDetails = async (req, res) => {
     });
   }
 };
+const handleStopLiving = async (req, res) => {
+  try {
+    const userId = req.user.id; // Lấy từ authMiddleware
+    const { room, stopTime } = req.body;
 
+    if (!room) {
+      return res.status(400).json({
+        message: "Missing room name",
+      });
+    }
+
+    await householdServices.onHouseholdStopLiving(room, userId, stopTime);
+
+    return res.status(200).json({
+      message: "Household has stopped living successfully",
+      leave_date: stopTime || new Date(),
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 export default {
   handleCreateHousehold,
   handleGetAllHouseholds,
   handleGetHouseholdDetails,
   getLivingHouseholdByRoom,
+  handleGetAllLivingHouseholds,
+  handleGetHouseholdsByRoom,
+  handleStopLiving,
 };

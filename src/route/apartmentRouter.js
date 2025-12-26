@@ -7,6 +7,7 @@ const router = express.Router();
 let initApartmentRouter = (app) => {
   router.post("/api/apartments", apartmentController.handleCreateApartment);
   router.get("/api/apartments", apartmentController.handleGetAllApartments);
+  router.get("/api/apartment", apartmentController.handleGetApartmentByUser);
 
   return app.use("/", router);
 };

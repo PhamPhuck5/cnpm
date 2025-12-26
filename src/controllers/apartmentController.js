@@ -41,7 +41,26 @@ const handleGetAllApartments = async (req, res) => {
   }
 };
 
+const handleGetApartmentByUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const apartment = await apartmentServices.getApartmentByUser(userId);
+    return res.status(200).json({
+      message: "Get all apartments success",
+      data: apartment,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   handleCreateApartment,
   handleGetAllApartments,
+  handleGetApartmentByUser,
 };

@@ -8,7 +8,7 @@ let initPaymentRouter = (app) => {
   router.post("/api/payments", authMiddleware, paymentController.handleCreatePayment);
   router.get("/api/payments/bill-list/:billId", authMiddleware, paymentController.handleGetAllPaymentByBill);
   router.get("/api/payments/stats/:billId", authMiddleware, paymentController.handleGetStatsByBill);
-
+  router.put("/api/payments/update/:id", authMiddleware, paymentController.handleUpdatePayment);
   return app.use("/", router);
 };
 

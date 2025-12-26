@@ -3,7 +3,7 @@ import { fn, col } from "sequelize";
 
 import householdServices from "./householdService.js";
 import { findBillByID } from "./billService.js";
-import { paymentStrategies, BILL_BASE } from "../../utils/getPaymentValue.js";
+import { BILL_BASE, calculateRequiredAmount } from "../../utils/getPaymentValue.js";
 import householdServices from "./householdService.js";
 
 async function createPayment(bill_id, amount, collector, householdId) {
@@ -58,15 +58,6 @@ async function getStatsByBill(bill_id) {
   });
   return payments[0];
 }
-
-const calculateRequiredAmount = (bill, household) => {
-  if (!bill.based) return bill.amount ?? 0;
-
-  const strategy = paymentStrategies[bill.based];
-  if (!strategy) return 0;
-
-  return strategy(bill.amount, household);
-};
 
 const paymentServices = {
   createPayment: createPayment,

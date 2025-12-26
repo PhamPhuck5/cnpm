@@ -47,7 +47,39 @@ let handleGetAllPaymentByBill = async (req, res) => {
     });
   }
 };
+const handleUpdatePayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const { amount, require } = req.body;
 
+    if (!id) {
+      return res.status(400).json({
+        message: "Missing payment ID",
+      });
+    }
+
+    // Gọi hàm updatePayment từ paymentService
+    const updatedPayment = await paymentServices.updatePayment(id, { amount, require }, userId);
+
+    return res.status(200).json({
+      message: "Update payment success",
+      data: updatedPayment,
+    });
+  } catch (error) {
+    console.error("Error at handleUpdatePayment:", error);
+
+    // Xử lý các lỗi nghiệp vụ từ service (ví dụ: "Payment not found" hoặc "can not update new require")
+    if (error.message === "Payment not found") {
+      return res.status(404).json({ message: error.message });
+    }
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 const handleGetStatsByBill = async (req, res) => {
   try {
     const { billId } = req.params;
@@ -82,6 +114,7 @@ const paymentController = {
   handleCreatePayment,
   handleGetAllPaymentByBill,
   handleGetStatsByBill,
+  handleUpdatePayment,
 };
 
 export default paymentController;

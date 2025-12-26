@@ -2,7 +2,7 @@
 import { Model, DataTypes } from "sequelize";
 
 export default (sequelize) => {
-  class Household extends Model {
+  class Room extends Model {
     static associate(models) {
       // define association here
       this.belongsTo(models.Apartment, {
@@ -11,7 +11,7 @@ export default (sequelize) => {
     }
   }
 
-  Household.init(
+  Room.init(
     {
       apartment_id: {
         type: DataTypes.INTEGER,
@@ -40,10 +40,10 @@ export default (sequelize) => {
     },
     {
       sequelize,
-      modelName: "Household",
-      tableName: "households",
+      modelName: "Room",
+      tableName: "rooms",
     }
   );
 
-  return Household;
+  return Room;
 };

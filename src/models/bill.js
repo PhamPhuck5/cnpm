@@ -17,7 +17,8 @@ export default (sequelize) => {
     }
   }
   /**
-   * currently, base have these type:
+  currently, base have these type:
+  NONE: "none",
   voluntary: "voluntary",
   fixed: "fixed",
   motorcycle: "motorcycle",

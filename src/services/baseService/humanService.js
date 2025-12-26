@@ -1,6 +1,7 @@
 // services/humanService.js
 import db from "../../models/index.js";
 import { getApartmentByUser } from "./apartmentService.js";
+
 async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {
   return await db.Human.create({
     household_id,
@@ -25,6 +26,7 @@ async function setLivingFalse(humanId) {
     }
   );
 }
+
 async function setLivingTrue(humanId) {
   return await db.Human.update(
     {
@@ -51,6 +53,27 @@ async function getLivingByHousehold(household_id) {
     order: [["id", "ASC"]],
   });
 }
+
+async function getAllHumansByApartmentId(userId) {
+  let user = await authServices.findUserByID(userId);
+  let apartmentId = user.apartment_id;
+  try {
+    const humans = await db.Human.findAll({
+      include: [
+        {
+          model: Household,
+          where: { apartment_id: apartmentId },
+          required: true,
+        },
+      ],
+    });
+    return humans;
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách cư dân:", error);
+    throw error;
+  }
+}
+
 async function getHumanByName(name, userId) {
   const apartmentId = await getApartmentByUser(userId);
   return Human.findAll({
@@ -78,5 +101,6 @@ export default {
   setLivingTrue,
   getAllByHousehold,
   getLivingByHousehold,
+  getAllHumansByApartmentId,
   getHumanByName,
 };

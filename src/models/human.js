@@ -23,6 +23,10 @@ export default (sequelize) => {
         type: DataTypes.STRING(32),
         allowNull: false,
       },
+      identity: {
+        type: DataTypes.STRING(12),
+        allowNull: true,
+      },
       phonenumber: {
         type: DataTypes.CHAR(11),
         allowNull: true,

@@ -29,15 +29,20 @@ export default (sequelize) => {
       },
       date: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       amount: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0,
+      },
+      require: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       collector: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {

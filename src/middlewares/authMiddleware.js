@@ -3,11 +3,10 @@ const { TokenExpiredError } = jwt;
 export function authMiddleware(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  console.log("auth middleware start working");
   if (!token)
     return res.status(401).json({
       status: 401,
-      message: "missing refresh token",
+      message: "missing access token",
       errCode: "login",
     });
   jwt.verify(token, process.env.ACCESS_KEY, (err, userInfo) => {
@@ -29,7 +28,6 @@ export function authMiddleware(req, res, next) {
       });
     }
     req.user = userInfo;
-    console.log("auth middleware verify success");
     next();
   });
 }

@@ -2,7 +2,7 @@
 
 export async function up(queryInterface, Sequelize) {
   await queryInterface.addIndex("households", {
-    fields: ["apartment_id", "room"],
+    fields: ["apartment_id", "room", "leave_date"],
     name: "idx_household",
   });
 }

@@ -37,4 +37,5 @@ export default {
 };
 export const CONFIG_VALUE = {
   MAX_TASK_LENGTH_MINUTES: 23 * 60,
+  SEEDER_APARTMENT_ID: 1,
 };

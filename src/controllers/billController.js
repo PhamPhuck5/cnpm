@@ -2,21 +2,19 @@ import billServices from "../services/baseService/billService.js";
 let handleCreateBill = async (req, res) => {
   try {
     let creatorId = req.user.id;
-    let name = req.body.email;
-    let last_date = req.body.last_date;
+    let name = req.body.name;
+
+    let startDate = req.body.start_date;
+    let amount = req.body.amount;
+    let lastDate = req.body.end_date;
     let based = req.body.based;
-    let newBill = await billServices.createNewBill(
-      creatorId,
-      name,
-      last_date,
-      based
-    );
+
+    let newBill = await billServices.createNewBill(creatorId, name, startDate, lastDate, amount, based);
     return res.status(200).json({
       status: 200,
       message: "create bill success",
       data: {
-        name: name,
-        last_date: last_date,
+        newBill,
       },
     });
   } catch (e) {

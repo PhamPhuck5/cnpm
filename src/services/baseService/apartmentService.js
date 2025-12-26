@@ -21,6 +21,12 @@ export async function getApartmentByUser(userId) {
   return user.apartment_id;
 }
 
+export async function getApartmentInfoForUser(userId) {
+  let user = await authServices.findUserByID(userId);
+
+  return await authServices.findUserByID(user.apartment_id); //new
+}
+
 const apartmentServices = {
   createNewApartment: createNewApartment,
   getAllApartments: getAllApartments,

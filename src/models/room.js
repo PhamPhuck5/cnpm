@@ -5,12 +5,6 @@ export default (sequelize) => {
   class Household extends Model {
     static associate(models) {
       // define association here
-      this.hasMany(models.Payment, {
-        foreignKey: "household_id",
-      });
-      this.hasMany(models.Human, {
-        foreignKey: "household_id",
-      });
       this.belongsTo(models.Apartment, {
         foreignKey: "apartment_id",
       });
@@ -22,28 +16,26 @@ export default (sequelize) => {
       apartment_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
       room: {
         type: DataTypes.STRING(8),
         allowNull: false,
+        primaryKey: true,
       },
-
-      start_date: {
-        type: DataTypes.DATE,
+      type: {
+        type: DataTypes.STRING(32),
         allowNull: false,
       },
-      leave_date: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        defaultValue: null,
+      area: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0.0,
       },
-      number_motobike: {
-        type: DataTypes.TINYINT,
-        allowNull: true,
-      },
-      number_car: {
-        type: DataTypes.TINYINT,
-        allowNull: true,
+      feePerMeter: {
+        //todo: an api for user to change this by type
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
     },
     {

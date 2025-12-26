@@ -32,6 +32,10 @@ export default (sequelize) => {
         allowNull: false,
         defaultValue: 0.0,
       },
+      number_floors: {
+        type: DataTypes.SMALLINT,
+        allowNull: true,
+      },
     },
     {
       sequelize,

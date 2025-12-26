@@ -1,18 +1,19 @@
 import db from "../../models/index.js";
 import authServices from "./authServices.js";
 
-async function createNewBill(creatorId, name, last_date, based = null) {
+async function createNewBill(creatorId, name, start_date, last_date, amount, based = null) {
   let creator = await authServices.findUserByID(creatorId);
   const newBill = await db.Bill.create({
     name: name,
     apartment_id: creator.apartment_id,
     based: based,
-    start_date: new Date(),
+    amount: amount,
+    start_date: start_date ? new Date(start_date) : new Date(),
     last_date: new Date(last_date),
     user_create: creator.id,
   });
   return newBill;
-}
+} //todo: create payment àter this
 export async function findBillByID(id, userId) {
   if (!(await checkPermission(id, userId))) {
     throw new error("not permission");

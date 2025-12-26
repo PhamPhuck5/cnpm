@@ -4,6 +4,7 @@ export const BILL_BASE = {
   MOTORCYCLE: "motorcycle",
   CAR: "car",
   AREA: "area",
+  NONE: "none",
 };
 
 export const paymentStrategies = {
@@ -16,4 +17,6 @@ export const paymentStrategies = {
   [BILL_BASE.CAR]: (amount, household) => amount * household.number_car,
 
   [BILL_BASE.AREA]: (amount, household) => household.area * household.feePerMeter,
+
+  [BILL_BASE.NONE]: (amount, household) => null,
 };

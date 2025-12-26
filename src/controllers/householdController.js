@@ -2,6 +2,7 @@ import householdServices from "../services/baseService/householdService.js";
 
 const handleCreateHousehold = async (req, res) => {
   try {
+    //todo: require room exist
     const userId = req.user.id;
     const { room, number_motobike, number_car, start_date, type, feePerMeter } = req.body;
 
@@ -44,12 +45,12 @@ const handleGetAllHouseholds = async (req, res) => {
     });
   }
 };
-const handleGetHouseholdByRoom = async (req, res) => {
+const getLivingHouseholdByRoom = async (req, res) => {
   try {
     const userId = req.user.id;
     const { roomName } = req.params;
 
-    const households = await householdServices.getHouseholdByRoom(roomName, userId);
+    const households = await householdServices.getLivingHouseholdByRoom(roomName, userId);
 
     return res.status(200).json({
       message: "Get households success",
@@ -95,5 +96,5 @@ export default {
   handleCreateHousehold,
   handleGetAllHouseholds,
   handleGetHouseholdDetails,
-  handleGetHouseholdByRoom,
+  getLivingHouseholdByRoom,
 };

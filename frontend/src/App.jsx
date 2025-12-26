@@ -10,6 +10,7 @@ import CreateHousehold from './pages/Household/CreateHousehold';
 import HouseholdDetail from './pages/Household/HouseholdDetail';
 import BillList from './pages/Finance/BillList';
 import CreateBill from './pages/Finance/CreateBill';
+import BillDetail from './pages/Finance/BillDetail';
 const ProtectedRoute = () => {
     const token = localStorage.getItem('token');
     return token ? <Outlet /> : <Navigate to="/login" replace />;
@@ -40,7 +41,7 @@ function App() {
                 {/* 4. Module Tài Chính */}
                 <Route path="/fees/create-bill" element={<CreateBill />} />
                 <Route path="/finance/bills" element={<BillList />} />
-                {/* <Route path="/finance/create" element={<CreateBill />} /> */}
+                <Route path="/finance/bills/:id" element={<BillDetail />} />
 
             </Route>
         </Route>

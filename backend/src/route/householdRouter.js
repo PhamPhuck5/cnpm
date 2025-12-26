@@ -7,7 +7,7 @@ const router = express.Router();
 let initHouseholdRouter = (app) => {
   router.post("/api/households/create", authMiddleware, householdController.handleCreateHousehold);
   router.get("/api/households", authMiddleware, householdController.handleGetAllHouseholds);
-  router.get("/api/household/roomname/:name", authMiddleware, householdController.handleGetHouseholdByRoom);
+  router.get("/api/household/roomname/:room", authMiddleware, householdController.handleGetHouseholdByRoom);
   router.get("/api/households/:id", authMiddleware, householdController.handleGetHouseholdDetails);
 
   return app.use("/", router);

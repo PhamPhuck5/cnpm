@@ -49,6 +49,7 @@ const handleGetHouseholdByRoom = async (req, res) => {
   try {
     const userId = req.user.id;
     const { room } = req.params;
+    console.log("Backend nhận được room name:", room);
 
     const households = await householdServices.getHouseholdByRoom(room, userId);
 

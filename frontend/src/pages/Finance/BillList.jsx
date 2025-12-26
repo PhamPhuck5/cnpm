@@ -1,63 +1,81 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllBills } from '../../api/financeService';
 import { Link } from 'react-router-dom';
 
 const BillList = () => {
-    // Dữ liệu giả lập vì Backend chưa có API lấy tất cả Bill cho Admin
-    // Bạn cần viết API: GET /api/bills (Admin only)
-    const [bills] = useState([
-        { id: 101, room: '12', month: '12/2025', total: 1560000, status: 'Unpaid' },
-        { id: 102, room: '34', month: '12/2025', total: 2100000, status: 'Paid' },
-        { id: 103, room: '23', month: '12/2025', total: 850000, status: 'Unpaid' },
-    ]);
+    const [bills, setBills] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const formatMoney = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    useEffect(() => {
+        fetchBills();
+    }, []);
+
+    const fetchBills = async () => {
+        try {
+            const res = await getAllBills();
+            setBills(res.data?.data || res.data || []);
+        } catch (error) {
+            console.error("Lỗi tải bills:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const formatDate = (date) => date ? new Date(date).toLocaleDateString('vi-VN') : 'N/A';
 
     return (
         <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">💰 Quản Lý Thu Phí</h1>
-                <Link to="/finance/create" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium shadow transition">
-                    + Tạo Đợt Thu Mới
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">💰 Quản Lý Hóa Đơn & Đợt Thu</h1>
+                    <p className="text-sm text-gray-500">Danh sách các đợt thu phí của tòa nhà</p>
+                </div>
+                <Link to="/finance/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 shadow transition">
+                    + Tạo Hóa Đơn Mới
                 </Link>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full text-left">
-                    <thead className="bg-green-50 text-green-800 text-xs uppercase font-bold">
-                        <tr>
-                            <th className="px-6 py-3">Mã HĐ</th>
-                            <th className="px-6 py-3">Phòng</th>
-                            <th className="px-6 py-3">Tháng</th>
-                            <th className="px-6 py-3 text-right">Tổng tiền</th>
-                            <th className="px-6 py-3 text-center">Trạng thái</th>
-                            <th className="px-6 py-3 text-center">Tác vụ</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {bills.map((bill) => (
-                            <tr key={bill.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 font-mono text-gray-500">#{bill.id}</td>
-                                <td className="px-6 py-4 font-bold text-gray-800">P.{bill.room}</td>
-                                <td className="px-6 py-4">{bill.month}</td>
-                                <td className="px-6 py-4 text-right font-medium">{formatMoney(bill.total)}</td>
-                                <td className="px-6 py-4 text-center">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold 
-                                        ${bill.status === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        {bill.status === 'Paid' ? 'Đã thanh toán' : 'Chưa đóng'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-center">
-                                    {bill.status === 'Unpaid' && (
-                                        <button className="text-blue-600 hover:underline text-sm font-medium">
-                                            Thu tiền
-                                        </button>
-                                    )}
-                                </td>
+            {loading ? (
+                <div className="text-center py-10">Đang tải...</div>
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full leading-normal">
+                        <thead>
+                            <tr className="bg-gray-100 text-gray-600 text-xs uppercase font-bold text-left">
+                                <th className="px-5 py-3">ID</th>
+                                <th className="px-5 py-3">Tên Đợt Thu (Email/Title)</th>
+                                <th className="px-5 py-3">Loại phí (Based)</th>
+                                <th className="px-5 py-3">Hạn đóng</th>
+                                <th className="px-5 py-3 text-center">Tác vụ</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {bills.map((bill) => (
+                                <tr key={bill.id} className="hover:bg-gray-50">
+                                    <td className="px-5 py-4 font-mono text-sm">#{bill.id}</td>
+                                    <td className="px-5 py-4 font-bold text-blue-900">{bill.email}</td>
+                                    <td className="px-5 py-4 text-sm">
+                                        <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">
+                                            {bill.based}
+                                        </span>
+                                    </td>
+                                    <td className="px-5 py-4 text-sm text-red-500 font-medium">
+                                        {formatDate(bill.last_date)}
+                                    </td>
+                                    <td className="px-5 py-4 text-center">
+                                        <Link 
+                                            to={`/finance/bills/${bill.id}`}
+                                            className="text-blue-600 hover:underline font-medium text-sm"
+                                        >
+                                            Xem chi tiết & Thu tiền
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };

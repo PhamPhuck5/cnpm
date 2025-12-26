@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { searchResidentsByName, searchHouseholdsByRoom} from '../../api/searchService';
+import { searchResidentsByName, getHouseholdByRoom, getResidentsByHouseholdId} from '../../api/searchService';
 import ResidentResults from './components/ResidentResults';
 import RoomResults from './components/RoomResults';
 import ResidentDetailModal from './components/ResidentDetailModal';
@@ -39,12 +39,14 @@ const SearchCenter = () => {
                 // 1. TÌM THEO TÊN
                 const res = await searchResidentsByName(query);
                 // Backend trả về mảng humans trực tiếp hoặc trong res.data
-                setResidentResults(res.data || res || []);
+                const data = res.data?.data || res.data || [];
+                setResidentResults(Array.isArray(data) ? data : []);
             } else {
                 // 2. TÌM THEO SỐ PHÒNG
                 // Bước A: Tìm thông tin hộ khẩu
-                const res = await searchHouseholdsByRoom(query);
-                const households = res.data || res || [];
+                const res = await getHouseholdByRoom(query);
+                const responseData = res.data?.data || res.data || [];
+                const households = Array.isArray(responseData) ? responseData : [];
                 
                 if (households.length > 0) {
                     // Lấy hộ khẩu mới nhất (phần tử đầu tiên hoặc logic sort date)
@@ -54,7 +56,8 @@ const SearchCenter = () => {
                     // Bước B: Gọi tiếp API lấy danh sách người trong hộ này
                     if (activeHousehold.id) {
                         const humanRes = await getResidentsByHouseholdId(activeHousehold.id);
-                        setRoomResidents(humanRes.data || humanRes || []);
+                        const humanData = humanRes.data?.data || humanRes.data || [];
+                        setRoomResidents(humanData);
                     }
                 }
             }

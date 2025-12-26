@@ -1,5 +1,6 @@
 import db from "../../models/index.js";
 import authServices from "./authServices.js";
+import { Op } from 'sequelize';
 
 async function createHousehold(room, number_motobike, number_car, start_date, userId, type, feePerMeter) {
   let creator = await authServices.findUserByID(userId);
@@ -21,7 +22,7 @@ const getAllHouseholds = async (userId) => {
   try {
       let households = await db.Household.findAll({
         order: [['createdAt', 'DESC']],
-        raw: true,  // <--- Thêm dòng này để chắc chắn lấy dữ liệu thô
+        raw: false,  // <--- Thêm dòng này để chắc chắn lấy dữ liệu thô
         nest: true 
       });
       return households;
@@ -66,13 +67,20 @@ async function getHouseholdByRoom(room, userId) {
   return await db.Household.findAll({
     where: {
       apartment_id: user.apartment_id,
-      room: room,
+      room: {
+        [Op.like]: `%${room}%`
+      },
     },
     include: [
       {
         model: db.Apartment,
       },
+      {
+        model: db.Human,
+      },
     ],
+    nest: true,
+    raw: false
   });
 }
 

@@ -1,60 +1,68 @@
 import React, { useState } from 'react';
 import { createBill } from '../../api/financeService';
+import { useNavigate } from 'react-router-dom';
 
 const CreateBill = () => {
-    const [month, setMonth] = useState('');
-    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',     // Tương ứng với tên đợt thu trong API của bạn
+        based: 'Số điện', // Mặc định
+        last_date: ''
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if(!month) return alert("Vui lòng chọn tháng!");
-
-        setLoading(true);
         try {
-            // Logic: Gửi tháng năm lên backend để generate bill cho toàn bộ căn hộ
-            // Ví dụ backend cần body: { month: 12, year: 2025 }
-            const dateObj = new Date(month);
-            const payload = {
-                month: dateObj.getMonth() + 1,
-                year: dateObj.getFullYear()
-            };
-
-            await createBill(payload);
-            alert("Tạo đợt thu thành công!");
+            await createBill(formData);
+            alert("✅ Tạo hóa đơn thành công!");
+            navigate('/finance/bills');
         } catch (error) {
-            console.error(error);
-            alert("Lỗi khi tạo đợt thu (Có thể đã tạo rồi).");
-        } finally {
-            setLoading(false);
+            alert("Lỗi: " + (error.response?.data?.message || error.message));
         }
     };
 
     return (
-        <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">📝 Tạo Đợt Thu Phí Mới</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="max-w-lg mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg border border-gray-100">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Tạo Đợt Thu Mới</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                
                 <div>
-                    <label className="block text-gray-700 font-medium mb-2">Chọn Tháng/Năm</label>
+                    <label className="block text-gray-700 font-medium mb-1">Tên Đợt Thu (Email/Tiêu đề)</label>
                     <input 
-                        type="month" 
-                        required
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        value={month}
-                        onChange={(e) => setMonth(e.target.value)}
+                        type="text" required
+                        placeholder="VD: bill_dien_thang_12@gmail.com"
+                        className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
-                    <p className="text-xs text-gray-500 mt-2">
-                        *Hệ thống sẽ tự động tính toán phí dịch vụ, gửi xe cho tất cả căn hộ trong tháng này.
-                    </p>
                 </div>
 
-                <button 
-                    type="submit" 
-                    disabled={loading}
-                    className={`w-full py-3 text-white font-bold rounded-lg transition
-                        ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-                >
-                    {loading ? 'Đang xử lý...' : 'Xác Nhận Tạo Hóa Đơn'}
+                <div>
+                    <label className="block text-gray-700 font-medium mb-1">Loại phí (Based on)</label>
+                    <select 
+                        className="w-full border p-3 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={formData.based}
+                        onChange={(e) => setFormData({...formData, based: e.target.value})}
+                    >
+                        <option value="Số điện">⚡ Tiền Điện</option>
+                        <option value="Số nước">💧 Tiền Nước</option>
+                        <option value="Dịch vụ">🛡️ Phí Dịch Vụ</option>
+                        <option value="Gửi xe">🅿️ Phí Gửi Xe</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium mb-1">Hạn đóng tiền</label>
+                    <input 
+                        type="date" required
+                        className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={formData.last_date}
+                        onChange={(e) => setFormData({...formData, last_date: e.target.value})}
+                    />
+                </div>
+
+                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition shadow-lg">
+                    Xác nhận tạo
                 </button>
             </form>
         </div>

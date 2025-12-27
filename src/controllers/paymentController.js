@@ -95,6 +95,7 @@ const handleGetStatsByBill = async (req, res) => {
     const responseData = {
       totalCollected: stats.totalCollected || 0,
       totalPayments: stats.totalPayments || 0,
+      totalRequire: stats.totalRequire || 0,
     };
 
     return res.status(200).json({

@@ -1,5 +1,5 @@
 import { Op, literal } from "sequelize";
-import db from "../models/index.js";
+import db from "../../models/index.js";
 import { getApartmentByUser } from "./apartmentService.js";
 
 /**
@@ -40,12 +40,14 @@ export async function getEmptyRooms(apartmentId) {
   return await db.Room.findAll({
     where: {
       apartment_id: apartmentId,
-      [Op.not]: literal(`EXISTS (
-        SELECT 1 FROM households h
-        WHERE h.room = Room.room
-          AND h.apartment_id = Room.apartment_id
-          AND h.leave_date IS NULL
-      )`),
+      [Op.and]: literal(`
+        NOT EXISTS (
+          SELECT 1 FROM households h
+          WHERE h.room = Room.room
+            AND h.apartment_id = Room.apartment_id
+            AND h.leave_date IS NULL
+        )
+      `),
     },
     order: [["room", "ASC"]],
   });

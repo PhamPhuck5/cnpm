@@ -1,6 +1,7 @@
 // services/humanService.js
 import db from "../../models/index.js";
 import { getApartmentByUser } from "./apartmentService.js";
+import authServices from "./authServices.js";
 import { Op } from "sequelize";
 
 async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {

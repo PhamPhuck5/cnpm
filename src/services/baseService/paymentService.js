@@ -51,10 +51,11 @@ async function getStatsByBill(bill_id) {
     attributes: [
       [db.sequelize.fn("SUM", db.sequelize.col("amount")), "totalCollected"],
       [db.sequelize.fn("COUNT", db.sequelize.col("id")), "totalPayments"],
-      [db.sequelize.fn("SUM", db.sequelize.col("require")), "totalRequire"],
+      [db.sequelize.fn("SUM", db.sequelize.col("Payment.require")), "totalRequire"],
     ],
     raw: true,
   });
+  console.log(payments);
   return payments[0];
 }
 

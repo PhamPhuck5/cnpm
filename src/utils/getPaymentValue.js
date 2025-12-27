@@ -21,7 +21,7 @@ export const paymentStrategies = {
   [BILL_BASE.NONE]: (amount, household) => null,
 };
 
-const calculateRequiredAmount = (bill, household) => {
+export const calculateRequiredAmount = (bill, household) => {
   if (!bill.based) return bill.amount ?? 0;
 
   const strategy = paymentStrategies[bill.based];

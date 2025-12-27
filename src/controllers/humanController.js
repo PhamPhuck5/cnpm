@@ -56,6 +56,7 @@ async function getAllInApartment(req, res) {
 
     return res.json(humans);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 }

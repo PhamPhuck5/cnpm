@@ -26,6 +26,6 @@ let initRoomRouter = (app) => {
    */
   router.get("/occupied", authMiddleware, roomController.handleGetOccupiedRooms);
 
-  return app.use("/api/rooms", router);
+  return app.use("/api/room", router);
 };
 export default initRoomRouter;

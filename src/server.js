@@ -21,8 +21,13 @@ initWebRouter(app);
 
 checkConnection();
 // db.sequelize.authenticate();
-await db.sequelize.sync({ alter: true });
-// await db.sequelize.sync();
+// await db.sequelize.sync({ alter: true });
+
+// await db.sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
+// await db.sequelize.sync({ force: true });
+// await db.sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
+
+await db.sequelize.sync();
 console.log("finish working on connect db");
 
 app.use(limiter);

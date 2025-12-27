@@ -66,9 +66,9 @@ const handleGetAllLivingHouseholds = async (req, res) => {
 const getLivingHouseholdByRoom = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { roomName } = req.params;
+    const { name } = req.params;
 
-    const households = await householdServices.getLivingHouseholdByRoom(roomName, userId);
+    const households = await householdServices.getLivingHouseholdByRoom(name, userId);
 
     return res.status(200).json({
       message: "Get households success",

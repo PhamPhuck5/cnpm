@@ -12,7 +12,7 @@ export default (sequelize) => {
         foreignKey: "room",
         targetKey: "room",
         scope: {
-          apartment_id: sequelize.col("Household.apartment_id"),
+          apartment_id: sequelize.col("Room.apartment_id"),
         },
         constraints: false, // turn of sequelize check pk constrain Sequelize
       });

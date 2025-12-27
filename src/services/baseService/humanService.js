@@ -1,6 +1,7 @@
 // services/humanService.js
 import db from "../../models/index.js";
 import { getApartmentByUser } from "./apartmentService.js";
+import { Op } from "sequelize";
 
 async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {
   return await db.Human.create({
@@ -61,7 +62,7 @@ async function getAllHumansByApartmentId(userId) {
     const humans = await db.Human.findAll({
       include: [
         {
-          model: Household,
+          model: db.Household,
           where: { apartment_id: apartmentId },
           required: true,
         },
@@ -84,7 +85,7 @@ async function getHumanByName(name, userId) {
     },
     include: [
       {
-        model: Household,
+        model: db.Household,
         required: true,
         where: {
           apartment_id: apartmentId,

@@ -45,7 +45,7 @@ const handleGetApartmentByUser = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const apartment = await apartmentServices.getApartmentByUser(userId);
+    const apartment = await apartmentServices.getApartmentInfoForUser(userId);
     return res.status(200).json({
       message: "Get all apartments success",
       data: apartment,

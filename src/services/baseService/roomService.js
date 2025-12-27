@@ -1,5 +1,6 @@
 import { Op, literal } from "sequelize";
 import db from "../models/index.js";
+import { getApartmentByUser } from "./apartmentService.js";
 
 /**
  * Lấy tất cả room theo apartment
@@ -49,3 +50,23 @@ export async function getEmptyRooms(apartmentId) {
     order: [["room", "ASC"]],
   });
 }
+
+async function getEmptyRoomsByUserId(userId) {
+  let apartment_id = await getApartmentByUser(userId);
+  return await getEmptyRooms(apartment_id);
+}
+
+async function getOccupiedRoomsByUserId(userId) {
+  let apartment_id = await getApartmentByUser(userId);
+  return await getOccupiedRooms(apartment_id);
+}
+async function getAllRoomsByUserId(userId) {
+  let apartment_id = await getApartmentByUser(userId);
+  return await getRoomsByApartment(apartment_id);
+}
+
+export default {
+  getEmptyRoomsByUserId,
+  getOccupiedRoomsByUserId,
+  getAllRoomsByUserId,
+};

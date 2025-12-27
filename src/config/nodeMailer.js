@@ -1,24 +1,24 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_NAME,
-    pass: process.env.GMAIL_SECRET,
-  },
-});
-
-// let testAccount = await nodemailer.createTestAccount();
-
-// let transporter = nodemailer.createTransport({
-//   host: "smtp.ethereal.email",
-//   port: 587,
-//   secure: false,
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
 //   auth: {
-//     user: testAccount.user,
-//     pass: testAccount.pass,
+//     user: process.env.GMAIL_NAME,
+//     pass: process.env.GMAIL_SECRET,
 //   },
 // });
+
+let testAccount = await nodemailer.createTestAccount();
+
+let transporter = nodemailer.createTransport({
+  host: "smtp.ethereal.email",
+  port: 587,
+  secure: false,
+  auth: {
+    user: testAccount.user,
+    pass: testAccount.pass,
+  },
+});
 
 export const changePasswordEmail = async (userEmail, newPassword) => {
   const mailOptions = {

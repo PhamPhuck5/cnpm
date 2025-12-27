@@ -4,8 +4,8 @@ import initHouseholdRouter from "./householdRouter.js";
 import initHumanRouter from "./humanRouter.js";
 import initBillRouter from "./billRouter.js";
 import initPaymentRouter from "./paymentRouter.js";
-import initAbsentRouter from "./absentRouter.js";
-
+import initRecordRouter from "./recordRouter.js";
+import initRoomRouter from "./roomRouter.js";
 let initAppRouter = (app) => {
   initAuthRouter(app);
   initApartmentRouter(app);
@@ -13,7 +13,8 @@ let initAppRouter = (app) => {
   initHumanRouter(app);
   initBillRouter(app);
   initPaymentRouter(app);
-  initAbsentRouter(app);
+  initRecordRouter(app);
+  initRoomRouter(app);
 };
 
 export default initAppRouter;

@@ -4,7 +4,6 @@ import { fn, col } from "sequelize";
 import householdServices from "./householdService.js";
 import { findBillByID } from "./billService.js";
 import { BILL_BASE, calculateRequiredAmount } from "../../utils/getPaymentValue.js";
-import householdServices from "./householdService.js";
 
 async function createPayment(bill_id, amount, collector, householdId) {
   const bill = await findBillByID(bill_id);

@@ -24,12 +24,15 @@ export async function getApartmentByUser(userId) {
 export async function getApartmentInfoForUser(userId) {
   let user = await authServices.findUserByID(userId);
 
-  return await authServices.findUserByID(user.apartment_id); //new
+  return await db.Apartment.findOne({
+    where: { id: user.apartment_id },
+  });
 }
 
 const apartmentServices = {
   createNewApartment: createNewApartment,
   getAllApartments: getAllApartments,
   getApartmentByUser: getApartmentByUser,
+  getApartmentInfoForUser: getApartmentInfoForUser,
 };
 export default apartmentServices;

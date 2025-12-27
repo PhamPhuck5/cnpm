@@ -14,6 +14,14 @@ export default (sequelize) => {
       this.belongsTo(models.Apartment, {
         foreignKey: "apartment_id",
       });
+      this.belongsTo(models.Room, {
+        foreignKey: "room",
+        targetKey: "room",
+        scope: {
+          apartment_id: sequelize.col("Household.apartment_id"),
+        },
+        constraints: false, // turn of sequelize check pk constrain Sequelize
+      });
     }
   }
 
@@ -37,7 +45,7 @@ export default (sequelize) => {
         allowNull: true,
         defaultValue: null,
       },
-      number_motobike: {
+      number_motorbike: {
         type: DataTypes.TINYINT,
         allowNull: true,
       },

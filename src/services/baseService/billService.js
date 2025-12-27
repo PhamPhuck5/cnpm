@@ -59,7 +59,7 @@ async function createNewBill(creatorId, name, start_date, last_date, amount, bas
 
 export async function findBillByID(id, userId) {
   if (!(await checkPermission(id, userId))) {
-    throw new error("not permission");
+    throw new Error("not permission");
   }
   const bill = await db.Bill.findOne({
     where: { id: id },

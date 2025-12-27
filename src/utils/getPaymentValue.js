@@ -12,7 +12,7 @@ export const paymentStrategies = {
 
   [BILL_BASE.FIXED]: (amount, household) => amount,
 
-  [BILL_BASE.MOTORCYCLE]: (amount, household) => amount * household.number_motobike,
+  [BILL_BASE.MOTORCYCLE]: (amount, household) => amount * household.number_motorbike,
 
   [BILL_BASE.CAR]: (amount, household) => amount * household.number_car,
 

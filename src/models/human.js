@@ -7,7 +7,7 @@ export default (sequelize) => {
       this.belongsTo(models.Household, {
         foreignKey: "household_id",
       });
-      this.hasMany(models.Absent, {
+      this.hasMany(models.ResidenceRecord, {
         foreignKey: "humanId",
       });
     }

@@ -12,7 +12,7 @@ let handleCreatePayment = async (req, res) => {
     return res.status(200).json({
       status: 200,
       message: "create payment success",
-      data: payment,
+      data: newPayment,
     });
   } catch (e) {
     console.error(e);

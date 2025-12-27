@@ -1,594 +1,479 @@
 {
-	"info": {
-		"_postman_id": "7b9bd68e-19db-4604-ad12-6aa665f27395",
-		"name": "Apartment Management - Hardcoded 3003",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "46852807"
-	},
-	"item": [
-		{
-			"name": "Auth (Xác thực)",
-			"item": [
-				{
-					"name": "Đăng nhập (Login)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/login",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Đăng ký (Register)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Người dùng mới\",\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456789\",\n    \"apartmentId\": 1,\n    \"phonenumber\": \"0123456789\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/register",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"register"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Apartments (Căn hộ/Tòa nhà)",
-			"item": [
-				{
-					"name": "Lấy danh sách tòa nhà",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/apartments",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"apartments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Tạo tòa nhà mới",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Chung cư Goldmark\",\n    \"address\": \"136 Hồ Tùng Mậu\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/apartments",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"apartments"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Households (Hộ gia đình)",
-			"item": [
-				{
-					"name": "Lấy danh sách hộ gia đình (theo User)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/households",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"households"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "tạo hộ gia đình",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n     \"room\":101, \"number_motobike\": 1,\"number_car\": 2\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/households/create",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"households",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Chi tiết hộ gia đình",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/households/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"households",
-								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Bills (Hóa đơn)",
-			"item": [
-				{
-					"name": "Lấy tất cả hóa đơn của tòa nhà",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/bills/my-apartment",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"bills",
-								"my-apartment"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Chi tiết hóa đơn theo ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/bills/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"bills",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Tạo hóa đơn mới",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"bill_dien_thang_12@gmail.com\",\n    \"last_date\": \"2025-01-31\",\n    \"based\": \"Số điện\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/bills",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"bills"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Payments & Stats (Thanh toán)",
-			"item": [
-				{
-					"name": "Thống kê tiền đã thu của Bill",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/payments/stats/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"payments",
-								"stats",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "xem khoản thu những ai đã đóng",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MjQ1NzM3LCJleHAiOjE3NjYyNjczMzd9.SeJ-Crqslomd9S0xRRMKGQf5dg1k1HoNTVBz3eLjGGw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/payments/bill-list/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"payments",
-								"bill-list",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Tạo phiếu thanh toán",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"household_id\": 1,\n    \"bill_id\": 1,\n    \"amount\": 500000\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/payments",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"payments"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Humans (Nhân khẩu)",
-			"item": [
-				{
-					"name": "(tất cả kể cả còn ở k)Lấy nhân khẩu theo Hộ gia đình",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/humans/household/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"humans",
-								"household",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "(chỉ còn ở)Lấy nhân khẩu theo Hộ gia đình",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/humans/household/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"humans",
-								"household",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cập nhật trạng thái chuyển đi",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/humans/1/status",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"humans",
-								"1",
-								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cập nhật trạng thái chuyển về",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3003/api/humans/1/status/living",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"humans",
-								"1",
-								"status",
-								"living"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "tạo household",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"household_id\": 1,\r\n  \"name\": \"Nguyen Van A\",\r\n  \"phonenumber\": \"0987654321\",\r\n  \"email\": \"vana@example.com\",\r\n  \"dateOfBirth\": \"1995-05-20\",\r\n  \"role\": \"Thành viên\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/humans",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"humans"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "tạm trú tạm vắng",
-			"item": [
-				{
-					"name": "tạo tạm vắng mới (cái này đang k hợp lý do fix end date)",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
-				},
-				{
-					"name": "lấy tất cả tạm trú tạm vắng theo nhà",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
-				},
-				{
-					"name": "set thời hạn lấy tất cả tạm trú tạm vắng theo nhà Copy",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"note\":\"cái này k cần body đâu t ghi để viết lại form req cho m đọc cái dưới\",\r\n    \"url\": \"URL: http://localhost:3003/api/absents/household/{{householdId}}/filter\",\r\n    \"query\":\"startDate, endDate, limit, offset\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3003/api/absents/household/H001/filter?startDate=2023-01-01&endDate=2023-12-31&limit=10&offset=0",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3003",
-							"path": [
-								"api",
-								"absents",
-								"household",
-								"H001",
-								"filter"
-							],
-							"query": [
-								{
-									"key": "startDate",
-									"value": "2023-01-01"
-								},
-								{
-									"key": "endDate",
-									"value": "2023-12-31"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "offset",
-									"value": "0"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	]
+  "info": {
+    "_postman_id": "7b9bd68e-19db-4604-ad12-6aa665f27395",
+    "name": "Apartment Management - Hardcoded 3003",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46852807"
+  },
+  "item": [
+    {
+      "name": "Auth (Xác thực)",
+      "item": [
+        {
+          "name": "Đăng nhập (Login)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Đăng ký (Register)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Người dùng mới\",\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456789\",\n    \"apartmentId\": 1,\n    \"phonenumber\": \"0123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "register"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Apartments (Căn hộ/Tòa nhà)",
+      "item": [
+        {
+          "name": "Lấy danh sách tòa nhà",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/apartments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "apartments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tạo tòa nhà mới",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Chung cư Goldmark\",\n    \"address\": \"136 Hồ Tùng Mậu\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/apartments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "apartments"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Households (Hộ gia đình)",
+      "item": [
+        {
+          "name": "Lấy danh sách hộ gia đình (theo User)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/households",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "households"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "tạo hộ gia đình",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n     \"room\":101, \"number_motorbike\": 1,\"number_car\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/households/create",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "households", "create"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Chi tiết hộ gia đình",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/households/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "households", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bills (Hóa đơn)",
+      "item": [
+        {
+          "name": "Lấy tất cả hóa đơn của tòa nhà",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/bills/my-apartment",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "bills", "my-apartment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Chi tiết hóa đơn theo ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/bills/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "bills", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tạo hóa đơn mới",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"bill_dien_thang_12@gmail.com\",\n    \"last_date\": \"2025-01-31\",\n    \"based\": \"Số điện\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/bills",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "bills"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments & Stats (Thanh toán)",
+      "item": [
+        {
+          "name": "Thống kê tiền đã thu của Bill",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/payments/stats/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "payments", "stats", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "xem khoản thu những ai đã đóng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MjQ1NzM3LCJleHAiOjE3NjYyNjczMzd9.SeJ-Crqslomd9S0xRRMKGQf5dg1k1HoNTVBz3eLjGGw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/payments/bill-list/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "payments", "bill-list", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tạo phiếu thanh toán",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"household_id\": 1,\n    \"bill_id\": 1,\n    \"amount\": 500000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/payments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "payments"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Humans (Nhân khẩu)",
+      "item": [
+        {
+          "name": "(tất cả kể cả còn ở k)Lấy nhân khẩu theo Hộ gia đình",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/humans/household/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "humans", "household", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "(chỉ còn ở)Lấy nhân khẩu theo Hộ gia đình",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/humans/household/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "humans", "household", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cập nhật trạng thái chuyển đi",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/humans/1/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "humans", "1", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cập nhật trạng thái chuyển về",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3003/api/humans/1/status/living",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "humans", "1", "status", "living"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "tạo household",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"household_id\": 1,\r\n  \"name\": \"Nguyen Van A\",\r\n  \"phonenumber\": \"0987654321\",\r\n  \"email\": \"vana@example.com\",\r\n  \"dateOfBirth\": \"1995-05-20\",\r\n  \"role\": \"Thành viên\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/humans",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "humans"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "tạm trú tạm vắng",
+      "item": [
+        {
+          "name": "tạo tạm vắng mới (cái này đang k hợp lý do fix end date)",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "lấy tất cả tạm trú tạm vắng theo nhà",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "set thời hạn lấy tất cả tạm trú tạm vắng theo nhà Copy",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY2MTU3MTkwLCJleHAiOjE3NjYxNzg3OTB9.TM-DG-CjGj1Dfqe4NRfxcRkNCPnYY4qYE8M1U3RPqWw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"note\":\"cái này k cần body đâu t ghi để viết lại form req cho m đọc cái dưới\",\r\n    \"url\": \"URL: http://localhost:3003/api/absents/household/{{householdId}}/filter\",\r\n    \"query\":\"startDate, endDate, limit, offset\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3003/api/absents/household/H001/filter?startDate=2023-01-01&endDate=2023-12-31&limit=10&offset=0",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3003",
+              "path": ["api", "absents", "household", "H001", "filter"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2023-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2023-12-31"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
 }

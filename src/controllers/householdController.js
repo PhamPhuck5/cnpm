@@ -4,7 +4,7 @@ const handleCreateHousehold = async (req, res) => {
   try {
     //todo: require room exist
     const userId = req.user.id;
-    const { room, number_motobike, number_car, start_date, type, feePerMeter } = req.body;
+    const { room, number_motorbike, number_car, start_date, type, feePerMeter } = req.body;
 
     if (!room) {
       return res.status(400).json({
@@ -12,7 +12,7 @@ const handleCreateHousehold = async (req, res) => {
       });
     }
 
-    const newHousehold = await householdServices.createHousehold(room, number_motobike, number_car, start_date, userId, type, feePerMeter);
+    const newHousehold = await householdServices.createHousehold(room, number_motorbike, number_car, start_date, userId, type, feePerMeter);
 
     return res.status(201).json({
       message: "Create household success",

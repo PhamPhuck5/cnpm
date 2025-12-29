@@ -20,7 +20,9 @@ export const paymentStrategies = {
     const area = household.Room?.area || household.area || 0;
     const householdFee = household.Room?.feePerMeter || household.feePerMeter || 0;
     const finalPrice = amount > 0 ? amount : householdFee;
+
     console.log(`> Tính phí P.${household.Room?.room}: ${area}m2 x ${finalPrice}đ`);
+    
     return finalPrice * area;
   },
 

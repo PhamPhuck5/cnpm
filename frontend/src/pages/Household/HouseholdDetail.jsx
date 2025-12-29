@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
     getHouseholdDetail, 
     addResident, 
-    markAsLeave, 
-    markAsLiving,
+    markAsLeave,  // Dùng để báo tạm vắng/chuyển đi (living -> false)
+    markAsLiving, // Dùng để ĐK tạm trú/quay về (living -> true)
     stopLivingHousehold,
-    createRecord // <--- Import thêm hàm này
+    createRecord 
 } from '../../api/managementService';
 import { getHumansByHousehold } from '../../api/searchService';
 
@@ -26,12 +26,11 @@ const HouseholdDetail = () => {
         name: '', phonenumber: '', email: '', dateOfBirth: '', role: 'Thành viên'
     });
 
-    // --- STATE MODAL TẠM VẮNG / TẠM TRÚ (Mới) ---
+    // --- STATE MODAL TẠM VẮNG (Báo đi vắng) ---
     const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
     const [recordData, setRecordData] = useState({
         humanId: null,
         humanName: '',
-        type: 'absent', // 'absent' (Tạm vắng) hoặc 'temporary' (Tạm trú)
         start_date: '',
         last_date: ''
     });
@@ -42,8 +41,10 @@ const HouseholdDetail = () => {
 
     useEffect(() => {
         if (showHistory) {
+            // Xem lịch sử: Hiện tất cả mọi người (kể cả đã đi)
             setFilteredResidents(residents); 
         } else {
+            // Xem hiện tại: Chỉ hiện người đang sống (living = true)
             setFilteredResidents(residents.filter(r => r.living === true));
         }
     }, [residents, showHistory]);
@@ -61,12 +62,13 @@ const HouseholdDetail = () => {
         }
     };
 
-    // --- 1. XỬ LÝ THÊM CƯ DÂN MỚI ---
+    // --- 1. XỬ LÝ THÊM CƯ DÂN MỚI (Mặc định là Thường trú) ---
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
-            await addResident({ ...addFormData, household_id: parseInt(id) });
-            alert("✅ Thêm cư dân thành công!");
+            // Mặc định living = true (Thường trú)
+            await addResident({ ...addFormData, household_id: parseInt(id), living: true });
+            alert("✅ Thêm cư dân thành công! (Trạng thái: Thường trú)");
             setIsAddModalOpen(false);
             setAddFormData({ name: '', phonenumber: '', email: '', dateOfBirth: '', role: 'Thành viên' }); 
             loadData(); 
@@ -75,63 +77,59 @@ const HouseholdDetail = () => {
         }
     };
 
-    // --- 2. XỬ LÝ NÚT BẤM MỞ MODAL TẠM VẮNG/TRÚ ---
-    const openRecordModal = (human, type) => {
+    // --- 2. XỬ LÝ MỞ MODAL BÁO TẠM VẮNG ---
+    const openAbsentModal = (human) => {
         setRecordData({
             humanId: human.id,
             humanName: human.name,
-            type: type, // 'absent' hoặc 'temporary'
-            start_date: new Date().toISOString().split('T')[0], // Mặc định hôm nay
+            start_date: new Date().toISOString().split('T')[0],
             last_date: ''
         });
         setIsRecordModalOpen(true);
     };
 
-    // --- 3. GỌI API TẠO RECORD (Logic bạn cần) ---
-    const handleRecordSubmit = async (e) => {
+    // --- 3. XỬ LÝ SUBMIT BÁO TẠM VẮNG (Chuyển living -> false & Tạo Record) ---
+    const handleAbsentSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Xác định isAbsent dựa trên loại đang chọn
-            // type = 'absent' -> isAbsent = true (Tạm vắng)
-            // type = 'temporary' -> isAbsent = false (Tạm trú)
-            const isAbsent = recordData.type === 'absent';
-
-            const payload = {
+            // Bước 1: Tạo record tạm vắng
+            await createRecord({
                 humanId: recordData.humanId,
                 start_date: recordData.start_date,
                 last_date: recordData.last_date,
-                isAbsent: isAbsent // <--- Truyền đúng true/false vào đây
-            };
+                isAbsent: true // Đánh dấu là vắng mặt
+            });
 
-            console.log("Gửi API Record:", payload);
-            await createRecord(payload);
-            
-            alert(`✅ Đã đăng ký ${isAbsent ? 'Tạm vắng' : 'Tạm trú'} thành công!`);
+            // Bước 2: Cập nhật trạng thái living = false (để biến mất khỏi list hiện tại)
+            await markAsLeave(recordData.humanId); 
+
+            alert(`✅ Đã báo tạm vắng cho ${recordData.humanName}.`);
             setIsRecordModalOpen(false);
-            loadData(); // Load lại để cập nhật trạng thái
+            loadData();
         } catch (error) {
             alert("Lỗi: " + (error.response?.data?.message || error.message));
         }
     };
 
-    // --- 4. CÁC HÀM KHÁC (Chuyển đi, Kết thúc hộ...) ---
-    const handleStatusChange = async (humanId, isCurrentLiving) => {
-        try {
-            if (isCurrentLiving) {
-                if (window.confirm("Xác nhận người này đã CHUYỂN ĐI HẲN (Cắt khẩu)?")) {
-                    await markAsLeave(humanId);
-                }
-            } else {
-                if (window.confirm("Xác nhận người này đã QUAY VỀ sinh sống?")) {
-                    await markAsLiving(humanId);
-                }
+    // --- 4. XỬ LÝ ĐĂNG KÝ TẠM TRÚ / QUAY VỀ (Chuyển living -> true) ---
+    const handleRegisterTemporary = async (humanId, humanName) => {
+        if (window.confirm(`Xác nhận đăng ký Tạm Trú (Quay về) cho ${humanName}?`)) {
+            try {
+                // Bước 1: Cập nhật living = true
+                await markAsLiving(humanId);
+                
+                // Bước 2: Có thể tạo thêm record tạm trú nếu cần (isAbsent = false)
+                // Nhưng theo yêu cầu đơn giản của bạn, chỉ cần họ hiện lại là được.
+                
+                alert(`✅ Đã đăng ký tạm trú thành công! ${humanName} đã quay lại danh sách.`);
+                loadData();
+            } catch (error) {
+                alert("Lỗi cập nhật: " + (error.response?.data?.message || error.message));
             }
-            loadData();
-        } catch (error) {
-            alert("Lỗi cập nhật trạng thái cư dân!");
         }
     };
 
+    // --- 5. KẾT THÚC HỘ ---
     const handleStopLiving = async () => {
         if (!household) return;
         if (window.confirm(`Bạn có chắc chắn muốn kết thúc hộ khẩu tại phòng ${household.room}?`)) {
@@ -184,13 +182,13 @@ const HouseholdDetail = () => {
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition border
                             ${showHistory ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-600 border-gray-300'}`}
                     >
-                        {showHistory ? "Đang xem: Tất cả" : "Đang xem: Hiện tại"}
+                        {showHistory ? "Đang xem: Tất cả (Cả tạm vắng)" : "Đang xem: Hiện tại"}
                     </button>
 
                     {!household.end_date && (
                         <button 
                             onClick={() => setIsAddModalOpen(true)}
-                            className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 font-bold flex items-center gap-2 transition"
+                            className="bg-green-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-green-700 font-bold flex items-center gap-2 transition"
                         >
                             + Thêm Cư Dân
                         </button>
@@ -206,8 +204,7 @@ const HouseholdDetail = () => {
                             <th className="px-6 py-4">Họ Tên</th>
                             <th className="px-6 py-4">Vai trò</th>
                             <th className="px-6 py-4 text-center">Trạng thái</th>
-                            <th className="px-6 py-4 text-center">Đăng ký Biến động</th>
-                            <th className="px-6 py-4 text-center">Cắt Khẩu</th>
+                            <th className="px-6 py-4 text-center">Hành động</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -226,61 +223,33 @@ const HouseholdDetail = () => {
                                         </span>
                                     </td>
                                     
-                                    {/* CỘT TRẠNG THÁI (Hiển thị Tạm Vắng/Tạm Trú/Thường Trú) */}
+                                    {/* TRẠNG THÁI */}
                                     <td className="px-6 py-4 text-center">
-                                        {!isLiving ? (
-                                             <span className="text-gray-400 font-bold text-xs">○ Đã chuyển đi</span>
+                                        {isLiving ? (
+                                            <span className="text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs font-bold">● Thường trú</span>
                                         ) : (
-                                            /* Kiểm tra nếu có record active (Cần backend trả về field status/is_absent trong object resident) */
-                                            /* Giả sử logic hiển thị tạm thời: */
-                                            r.status === 'Tạm vắng' || r.is_absent === true ? (
-                                                <span className="text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-xs font-bold">⚠️ Tạm vắng</span>
-                                            ) : r.role === 'Tạm trú' || r.role === 'Khách' ? (
-                                                <span className="text-blue-600 bg-blue-100 px-2 py-1 rounded-full text-xs font-bold">🌐 Tạm trú</span>
-                                            ) : (
-                                                <span className="text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs font-bold">● Thường trú</span>
-                                            )
+                                            <span className="text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-xs font-bold">⚠️ Tạm vắng / Đã đi</span>
                                         )}
                                     </td>
 
-                                    {/* CỘT THAO TÁC ĐĂNG KÝ (TẠM VẮNG / TẠM TRÚ) */}
-                                    <td className="px-6 py-4 text-center">
-                                        {isLiving && !household.end_date && (
-                                            <div className="flex justify-center gap-2">
-                                                <button 
-                                                    onClick={() => openRecordModal(r, 'absent')}
-                                                    className="text-orange-600 hover:bg-orange-50 border border-orange-200 px-2 py-1 rounded text-xs font-bold transition"
-                                                    title="Báo người này đi vắng một thời gian"
-                                                >
-                                                    Báo Tạm Vắng
-                                                </button>
-                                                <button 
-                                                    onClick={() => openRecordModal(r, 'temporary')}
-                                                    className="text-blue-600 hover:bg-blue-50 border border-blue-200 px-2 py-1 rounded text-xs font-bold transition"
-                                                    title="Đăng ký tạm trú cho người này"
-                                                >
-                                                    ĐK Tạm Trú
-                                                </button>
-                                            </div>
-                                        )}
-                                    </td>
-
-                                    {/* CỘT CẮT KHẨU (CHUYỂN ĐI HẲN) */}
+                                    {/* HÀNH ĐỘNG */}
                                     <td className="px-6 py-4 text-center">
                                         {!household.end_date && (
                                             isLiving ? (
+                                                // Nếu ĐANG Ở -> Hiện nút BÁO TẠM VẮNG
                                                 <button 
-                                                    onClick={() => handleStatusChange(r.id, true)}
-                                                    className="text-red-500 hover:bg-red-50 px-2 py-1 rounded text-xs font-bold transition"
+                                                    onClick={() => openAbsentModal(r)}
+                                                    className="text-orange-600 hover:bg-orange-50 border border-orange-200 px-3 py-1.5 rounded text-xs font-bold transition"
                                                 >
-                                                    ❌ Chuyển đi
+                                                    ⚠️ Báo Tạm Vắng
                                                 </button>
                                             ) : (
+                                                // Nếu ĐÃ ĐI/TẠM VẮNG -> Hiện nút ĐK TẠM TRÚ (Quay về)
                                                 <button 
-                                                    onClick={() => handleStatusChange(r.id, false)}
-                                                    className="text-gray-500 hover:bg-gray-100 px-2 py-1 rounded text-xs font-medium"
+                                                    onClick={() => handleRegisterTemporary(r.id, r.name)}
+                                                    className="text-blue-600 hover:bg-blue-50 border border-blue-200 px-3 py-1.5 rounded text-xs font-bold transition"
                                                 >
-                                                    ↩ Quay về
+                                                    🌐 ĐK Tạm Trú
                                                 </button>
                                             )
                                         )}
@@ -288,7 +257,7 @@ const HouseholdDetail = () => {
                                 </tr>
                             )
                         }) : (
-                            <tr><td colSpan="6" className="text-center py-8 text-gray-400 italic">Trống</td></tr>
+                            <tr><td colSpan="4" className="text-center py-8 text-gray-400 italic">Chưa có cư dân nào.</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -299,7 +268,7 @@ const HouseholdDetail = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
                         <button onClick={() => setIsAddModalOpen(false)} className="absolute top-4 right-4 text-2xl">&times;</button>
-                        <h2 className="text-xl font-bold text-blue-800 mb-4">Thêm Cư Dân Mới</h2>
+                        <h2 className="text-xl font-bold text-green-700 mb-4">Thêm Cư Dân (Thường trú)</h2>
                         <form onSubmit={handleAddSubmit} className="space-y-4">
                             <input required className="w-full border p-2 rounded" placeholder="Họ tên"
                                 value={addFormData.name} onChange={e => setAddFormData({...addFormData, name: e.target.value})} />
@@ -313,46 +282,39 @@ const HouseholdDetail = () => {
                                 value={addFormData.role} onChange={e => setAddFormData({...addFormData, role: e.target.value})}>
                                 <option value="Thành viên">Thành viên</option>
                                 <option value="Chủ hộ">Chủ hộ</option>
-                                <option value="Khách">Khách / Tạm trú</option>
                             </select>
-                            <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 rounded mt-2">Xác Nhận</button>
+                            <button type="submit" className="w-full bg-green-600 text-white font-bold py-2 rounded mt-2 hover:bg-green-700">Xác Nhận Thêm</button>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* --- MODAL 2: ĐĂNG KÝ TẠM VẮNG / TẠM TRÚ (MỚI) --- */}
+            {/* --- MODAL 2: BÁO TẠM VẮNG --- */}
             {isRecordModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 relative animate-fade-in-up">
                         <button onClick={() => setIsRecordModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                         
-                        <h2 className={`text-xl font-bold mb-2 ${recordData.type === 'absent' ? 'text-orange-600' : 'text-blue-600'}`}>
-                            {recordData.type === 'absent' ? '⚠️ Báo Tạm Vắng' : '🌐 Đăng Ký Tạm Trú'}
-                        </h2>
+                        <h2 className="text-xl font-bold mb-2 text-orange-600">⚠️ Báo Tạm Vắng</h2>
                         <p className="text-sm text-gray-600 mb-4">
-                            Cư dân: <span className="font-bold text-gray-800">{recordData.humanName}</span>
+                            Xác nhận báo vắng mặt cho: <span className="font-bold text-gray-800">{recordData.humanName}</span>
                         </p>
                         
-                        <form onSubmit={handleRecordSubmit} className="space-y-4">
+                        <form onSubmit={handleAbsentSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Từ ngày (*)</label>
-                                <input required type="date" className="w-full border border-gray-300 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Bắt đầu vắng từ (*)</label>
+                                <input required type="date" className="w-full border border-gray-300 p-2.5 rounded focus:ring-2 focus:ring-orange-500 outline-none" 
                                     value={recordData.start_date} onChange={e => setRecordData({...recordData, start_date: e.target.value})} />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Đến ngày (Dự kiến)</label>
-                                <input required type="date" className="w-full border border-gray-300 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                                <input required type="date" className="w-full border border-gray-300 p-2.5 rounded focus:ring-2 focus:ring-orange-500 outline-none" 
                                     value={recordData.last_date} onChange={e => setRecordData({...recordData, last_date: e.target.value})} />
                             </div>
 
-                            <button 
-                                type="submit" 
-                                className={`w-full text-white font-bold py-3 rounded-lg shadow-md transition mt-2
-                                    ${recordData.type === 'absent' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-600 hover:bg-blue-700'}`}
-                            >
-                                Xác Nhận {recordData.type === 'absent' ? 'Tạm Vắng' : 'Tạm Trú'}
+                            <button type="submit" className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-orange-600 transition mt-2">
+                                Xác Nhận Tạm Vắng
                             </button>
                         </form>
                     </div>

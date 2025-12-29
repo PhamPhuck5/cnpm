@@ -3,11 +3,23 @@ import React from 'react';
 const ResidentDetailModal = ({ isOpen, onClose, data }) => {
     if (!isOpen || !data) return null;
 
-    // Format ngày sinh
     const formatDate = (dateString) => {
         if (!dateString) return "Chưa cập nhật";
         return new Date(dateString).toLocaleDateString('vi-VN');
     };
+
+    const isHouseholdMovedOut = data.Household?.leave_date;
+
+    let statusLabel = '○ Đã chuyển đi / Tạm vắng';
+    let statusClass = 'bg-gray-100 text-gray-500';
+
+    if (isHouseholdMovedOut) {
+        statusLabel = '🏠 Đã chuyển đi';
+        statusClass = 'bg-orange-100 text-orange-700';
+    } else if (data.living) {
+        statusLabel = '✅ Đang thường trú';
+        statusClass = 'bg-green-100 text-green-700';
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
@@ -57,9 +69,8 @@ const ResidentDetailModal = ({ isOpen, onClose, data }) => {
                         {/* Trạng thái sinh sống */}
                         <div className="col-span-2 pt-2">
                             <p className="text-gray-500 mb-1">Trạng thái</p>
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold inline-block
-                                ${data.living ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                {data.living ? '✅ Đang thường trú' : '❌ Đã chuyển đi / Tạm vắng'}
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold inline-block ${statusClass}`}>
+                                {statusLabel}
                             </span>
                         </div>
                     </div>

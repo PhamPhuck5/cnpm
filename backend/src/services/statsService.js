@@ -1,94 +1,107 @@
-import db from "../models"; // Import models của bạn
-const { Op } = require("sequelize");
+import db from "../models/index.js";
+import { Op } from "sequelize";
 
 // 1. Lấy số liệu KPI tổng quan
 async function getDashboardOverview() {
-    // Đếm tổng căn hộ
-    const totalApartments = await db.Apartment.count();
-
-    // Đếm tổng nhân khẩu đang ở (living: true)
-    const totalResidents = await db.Human.count({
-        where: { living: true }
-    });
-
-    // Tính tổng tiền dự kiến thu (Tất cả hóa đơn trong tháng hiện tại)
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-
-    const expectedRevenue = await db.Bill.sum('total', {
-        where: {
-            month: currentMonth,
-            year: currentYear
-        }
-    }) || 0;
-
-    // Tính tổng tiền thực thu (Tổng payment trong tháng)
-    // Lưu ý: Logic này đơn giản hóa, thực tế có thể cần query bảng Payment
-    const actualRevenue = await db.Bill.sum('total', {
-        where: {
-            month: currentMonth,
-            year: currentYear,
-            status: 'Paid' // Hoặc check bảng Payment
-        }
-    }) || 0;
-
-    return {
-        totalApartments,
-        totalResidents,
-        expectedRevenue,
-        actualRevenue
-    };
-}
-
-// 2. Lấy dữ liệu biểu đồ doanh thu (3 tháng gần nhất)
-async function getRevenueStats() {
-    // Logic này query 3 tháng gần nhất, group by tháng
-    // Đây là code giả lập logic query phức tạp, bạn có thể tinh chỉnh theo SQL
-    const currentMonth = new Date().getMonth() + 1;
-    const data = [];
-
-    for (let i = 2; i >= 0; i--) {
-        let m = currentMonth - i;
-        if (m <= 0) m += 12; // Xử lý qua năm
-        
-        const collected = await db.Bill.sum('total', {
-            where: { month: m, status: 'Paid' }
-        }) || 0;
-
-        const debt = await db.Bill.sum('total', {
-            where: { month: m, status: 'Unpaid' }
-        }) || 0;
-
-        data.push({
-            month: `Tháng ${m}`,
-            collected,
-            debt
+    try {
+        // 1. Tổng số hộ: Chỉ đếm những hộ có leave_date là NULL (chưa chuyển đi)
+        const totalHouseholds = await db.Household.count({
+            where: {
+                leave_date: null
+            }
         });
+
+        // 2. Tổng nhân khẩu: (Giữ nguyên logic đã sửa trước đó)
+        const totalResidents = await db.Human.count({
+            where: {
+                living: true
+            },
+            include: [
+                {
+                    model: db.Household,
+                    where: { leave_date: null },
+                    required: true 
+                }
+            ]
+        });
+
+        // --- 🔥 SỬA LOGIC TÍNH TIỀN TẠI ĐÂY ---
+
+        // 3. Dự kiến thu = Tổng số tiền YÊU CẦU (require) từ tất cả các payment
+        // (Thay vì lấy từ Bill, ta lấy từ Payment.require)
+        const expectedRevenue = await db.Payment.sum('require') || 0;
+
+        // 4. Thực tế thu = Tổng số tiền ĐÃ ĐÓNG (amount)
+        const actualRevenue = await db.Payment.sum('amount') || 0;
+
+        // 5. Công nợ
+        const debt = expectedRevenue - actualRevenue;
+
+        return {
+            totalHouseholds,
+            totalResidents,
+            expectedRevenue,
+            actualRevenue,
+            debt
+        };
+    } catch (error) {
+        console.error("Lỗi service overview:", error);
+        throw error;
     }
-    return data;
 }
 
-// 3. Tỷ lệ lấp đầy
-async function getOccupancyStats() {
-    // Đếm số hộ khẩu đang hoạt động (có người ở)
-    const occupied = await db.Household.count({
-        where: { 
-            // Điều kiện để coi là đang ở, ví dụ chưa có ngày chuyển đi hoặc living members > 0
-            // Tạm thời đếm số record trong bảng Household
-        }
-    });
-    
-    const totalApts = await db.Apartment.count();
-    const empty = totalApts - occupied;
+async function getRevenueStats() {
+    try {
+        const data = [];
+        const today = new Date();
 
-    return [
-        { name: 'Đang ở', value: occupied },
-        { name: 'Trống', value: empty > 0 ? empty : 0 }
-    ];
+        for (let i = 2; i >= 0; i--) {
+            let month = today.getMonth() + 1 - i;
+            let year = today.getFullYear();
+
+            if (month <= 0) {
+                month += 12;
+                year -= 1;
+            }
+
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0); 
+            
+            const collected = await db.Payment.sum('amount', {
+                where: {
+                    date: {
+                        [Op.between]: [startDate, endDate]
+                    }
+                }
+            }) || 0;
+
+            const expected = await db.Payment.sum('require', {
+                include: [{
+                    model: db.Bill,
+                    where: {
+                        start_date: {
+                            [Op.between]: [startDate, endDate]
+                        }
+                    },
+                    attributes: [] // Không cần lấy dữ liệu bill, chỉ để filter
+                }]
+            }) || 0;
+
+            data.push({
+                month: `T${month}/${year}`,
+                collected: collected,
+                debt: expected - collected < 0 ? 0 : expected - collected
+            });
+        }
+        return data;
+
+    } catch (error) {
+        console.error("Lỗi service chart:", error);
+        throw error;
+    }
 }
 
 export default {
     getDashboardOverview,
-    getRevenueStats,
-    getOccupancyStats
+    getRevenueStats
 };

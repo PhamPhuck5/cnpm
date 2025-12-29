@@ -5,15 +5,15 @@ export const createBill = (data) => {
 };
 
 export const getAllBills = () => {
-    return api.get('/api/bills');
+    return api.get('/api/bills/my-apartment');
 };
 
 export const getBillDetail = (id) => {
     return api.get(`/api/bills/${id}`);
 };
 
-export const createPayment = (data) => {
-    return api.post('/api/payments', data);
+export const updatePayment = (paymentId, data) => {
+    return api.put(`/api/payments/update/${paymentId}`, data);
 };
 
 export const getBillPayments = (billId) => {
@@ -23,3 +23,11 @@ export const getBillPayments = (billId) => {
 export const getPaymentStats = (billId) => {
     return api.get(`/api/payments/stats/${billId}`);
 };
+
+export const createPayment = (data) => {
+    return api.post('/api/payments', data);
+};
+
+export const deleteBill = (billId) => {
+    return api.delete(`/api/bills/${billId}`);
+}

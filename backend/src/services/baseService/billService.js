@@ -1,130 +1,145 @@
 import db from "../../models/index.js";
 import authServices from "./authServices.js";
-import { Op } from "sequelize"; // Sửa require thành import cho chuẩn ES6
+import { calculateRequiredAmount } from "../../utils/getPaymentValue.js";
 
-// 1. TẠO HÓA ĐƠN THỦ CÔNG
-// Thêm từ khóa 'export' vào trước hàm
-export async function createNewBill(householdId, name, amount, description) {
-  const newBill = await db.Bill.create({
-    household_id: householdId,
-    name: name || "Phí phát sinh",
-    total: amount,
-    description: description,
-    start_date: new Date(),
-    status: 'Unpaid',
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear()
-  });
-  return newBill;
-}
+async function createNewBill(creatorId, name, start_date, last_date, amount, based = null) {
+  const transaction = await db.sequelize.transaction();
 
-// 2. TẠO HÓA ĐƠN HÀNG LOẠT
-export async function generateMonthlyBills(month, year) {
-  const households = await db.Household.findAll();
-  const createdBills = [];
+  try {
+    let creator = await authServices.findUserByID(creatorId);
 
-  for (const h of households) {
-      const exist = await db.Bill.findOne({
-          where: { household_id: h.id, month, year }
-      });
-      if (exist) continue;
-
-      const feeService = h.area * h.feePerMeter; 
-      const feeMoto = (h.number_motobike || 0) * 70000;
-      const feeCar = (h.number_car || 0) * 1200000;
-      const totalAmount = feeService + feeMoto + feeCar;
-
-      const newBill = await db.Bill.create({
-          household_id: h.id,
-          room: h.room,
-          month: month,
-          year: year,
-          service_fee: feeService,
-          vehicle_fee: feeMoto + feeCar,
-          total: totalAmount,
-          status: 'Unpaid',
-      });
-      createdBills.push(newBill);
-  }
-  return createdBills;
-}
-
-// 3. ADMIN LẤY TẤT CẢ BILL
-export async function getAllBills(status = null) {
-  const whereClause = {};
-  if (status) whereClause.status = status;
-
-  return await db.Bill.findAll({
-    where: whereClause,
-    include: [
+    // 1. Tạo Bill mới
+    const newBill = await db.Bill.create(
       {
-        model: db.Household,
-        attributes: ["id", "room", "type"],
+        name: name,
+        apartment_id: creator.apartment_id,
+        based: based,
+        amount: amount,
+        start_date: start_date ? new Date(start_date) : new Date(),
+        last_date: new Date(last_date),
+        user_create: creator.id,
       },
-    ],
-    order: [
-      ["year", "DESC"], 
-      ["month", "DESC"]
-    ],
-  });
+      { transaction }
+    );
+
+    const activeHouseholds = await db.Household.findAll({
+      where: {
+        apartment_id: creator.apartment_id,
+        leave_date: null,
+      },
+      include: [
+        {
+          model: db.Room,
+          attributes: ['area', 'room', 'feePerMeter'],
+          required: true,
+        }
+      ],
+      transaction,
+    });
+
+    const paymentPromises = activeHouseholds.map((household) => {
+      console.log(`Hộ: ${household.id} | Phòng: ${household.Room?.room} | Giá riêng: ${household.Room?.feePerMeter}`);
+      const requiredAmount = calculateRequiredAmount(newBill, household);
+
+      return db.Payment.create(
+        {
+          household_id: household.id,
+          bill_id: newBill.id,
+          date: null,
+          amount: 0,
+          require: requiredAmount,
+          collector: null,
+        },
+        { transaction }
+      );
+    });
+
+    await Promise.all(paymentPromises);
+
+    await transaction.commit();
+    return newBill;
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Lỗi khi tạo bill và payments:", error);
+    throw error;
+  }
 }
 
-// 4. USER LẤY BILL CỦA MÌNH
-export async function getAllBillsOfApartment(userId) {
-  const user = await db.User.findByPk(userId);
-  if (!user) throw new Error("User not found");
-
-  const household = await db.Household.findOne({
-    where: { apartment_id: user.apartment_id },
-    order: [['createdAt', 'DESC']]
-  });
-
-  if (!household) return [];
-
-  const bills = await db.Bill.findAll({
-    where: {
-      household_id: household.id,
-    },
-    order: [["year", "DESC"], ["month", "DESC"]],
-  });
-
-  return bills;
-}
-
-// 5. CHI TIẾT BILL
-export async function findBillByID(id) {
+export async function findBillByID(id, userId) {
   const bill = await db.Bill.findOne({
     where: { id: id },
-    include: [{ model: db.Household }]
   });
-  if (!bill) throw new Error("Bill not found");
   return bill;
 }
 
-// 6. CHECK QUYỀN
-export async function checkPermission(billId, userId) {
-  const bill = await db.Bill.findByPk(billId);
-  if (!bill) return false;
-
-  const user = await db.User.findByPk(userId);
-  if (!user) return false;
-
-  const householdOfBill = await db.Household.findByPk(bill.household_id);
-  
-  if (householdOfBill && householdOfBill.apartment_id === user.apartment_id) {
-      return true;
+async function checkPermission(billId, userId) {
+  const bill = await db.Bill.findOne({
+    where: { id: billId },
+  });
+  let user = await authServices.findUserByID(userId);
+  if (!(bill && user)) {
+    throw new Error("not found bill or user, on testing if you see this create a bill before find it oke");
   }
-  return false;
+  return bill.apartment_id == user.apartment_id;
+}
+export async function getBillsByApartment(apartmentId) {
+  return db.Bill.findAll({
+    where: { apartment_id: apartmentId },
+    raw: true,
+  });
 }
 
-// Object này dùng cho Default Import (import billServices from ...)
-const billServices = {
-  createNewBill,
-  generateMonthlyBills,
-  getAllBills,
-  getAllBillsOfApartment,
-  findBillByID,
-  checkPermission
-};
+async function getAllBillsOfApartment(userId) {
+  const user = await db.User.findByPk(userId);
 
+  const bills = await db.Bill.findAll({
+    where: {
+      apartment_id: user.apartment_id,
+    },
+    include: [
+      {
+        model: db.User,
+        attributes: ["name"], // Chỉ lấy tên và email, tránh lộ password
+      },
+    ],
+    order: [["start_date", "DESC"]],
+  });
+
+  return bills.map(bill => bill.get({ plain: true }));
+}
+
+async function deleteBill(billId, userId) {
+  const hasPermission = await checkPermission(billId, userId);
+  if (!hasPermission) {
+    throw new Error("User does not have permission to delete this bill");
+  }
+
+  const transaction = await db.sequelize.transaction();
+  try {
+    await db.Payment.destroy({
+      where: { bill_id: billId },
+      transaction,
+    });
+
+    await db.Bill.destroy({
+      where: { id: billId },
+      transaction,
+    });
+
+    await transaction.commit();
+    return true;
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error deleting bill and associated payments:", error);
+    throw error;
+  }
+}
+
+const billServices = {
+  createNewBill: createNewBill,
+  getAllBillsOfApartment: getAllBillsOfApartment,
+  checkPermission: checkPermission,
+  findBillByID,
+  deleteBill,
+};
 export default billServices;

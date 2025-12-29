@@ -1,18 +1,18 @@
-// services/absentService.js
 import db from "../../models/index.js";
 import { Op } from "sequelize";
 
-async function createAbsent(humanId, start_date, last_date) {
-  return await db.Absent.create({
+async function createResidenceRecord(humanId, start_date, last_date, isAbsent = true) {
+  return await db.ResidenceRecord.create({
     humanId,
     start_date,
     last_date,
+    is_absent: isAbsent,
   });
 }
 
-async function endAbsent(humanId, start_date, last_date) {
+async function endRecord(humanId, start_date, last_date) {
   let lastDate = last_date ? new Date(last_date) : new Date();
-  return await db.Absent.update(
+  return await db.ResidenceRecord.update(
     {
       last_date: lastDate,
     },
@@ -25,8 +25,22 @@ async function endAbsent(humanId, start_date, last_date) {
   );
 }
 
+async function endRecordById(recordId, last_date) {
+  let lastDate = last_date ? new Date(last_date) : new Date();
+  return await db.ResidenceRecord.update(
+    {
+      last_date: lastDate,
+    },
+    {
+      where: {
+        id: recordId,
+      },
+    }
+  );
+}
+
 /**
- * by defaulse this func return 10 latest absents
+ * by defaulse this func return 10 latest records
  * @param {*} householdId
  * @param {*} startDate
  * @param {*} endDate
@@ -34,7 +48,7 @@ async function endAbsent(humanId, start_date, last_date) {
  * @param {*} offset
  * @returns
  */
-async function getAbsentsByHousehold(householdId, startDate, endDate, limit = 10, offset = 0) {
+async function getRecordsByHousehold(householdId, startDate, endDate, limit = 10, offset = 0) {
   const whereAbsent = {};
 
   if (startDate) {
@@ -45,7 +59,7 @@ async function getAbsentsByHousehold(householdId, startDate, endDate, limit = 10
     whereAbsent.last_date = { [Op.lte]: endDate };
   }
 
-  return await db.Absent.findAll({
+  return await db.ResidenceRecord.findAll({
     where: whereAbsent,
     include: [
       {
@@ -61,13 +75,14 @@ async function getAbsentsByHousehold(householdId, startDate, endDate, limit = 10
   });
 }
 
-async function getAllAbsentsByHousehold(householdId) {
-  return await getAbsentsByHousehold(householdId);
+async function getAllRecordByHousehold(householdId) {
+  return await getRecordsByHousehold(householdId);
 }
 
 export default {
-  createAbsent,
-  getAbsentsByHousehold,
-  getAllAbsentsByHousehold,
-  endAbsent,
+  createResidenceRecord,
+  endRecord,
+  endRecordById,
+  getRecordsByHousehold,
+  getAllRecordByHousehold,
 };

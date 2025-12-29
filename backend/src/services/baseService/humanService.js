@@ -1,5 +1,8 @@
 // services/humanService.js
 import db from "../../models/index.js";
+import { getApartmentByUser } from "./apartmentService.js";
+import authServices from "./authServices.js";
+import { Op } from "sequelize";
 
 async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {
   return await db.Human.create({
@@ -25,6 +28,7 @@ async function setLivingFalse(humanId) {
     }
   );
 }
+
 async function setLivingTrue(humanId) {
   return await db.Human.update(
     {
@@ -52,9 +56,30 @@ async function getLivingByHousehold(household_id) {
   });
 }
 
+async function getAllHumansByApartmentId(userId) {
+  let user = await authServices.findUserByID(userId);
+  let apartmentId = user.apartment_id;
+  try {
+    const humans = await db.Human.findAll({
+      include: [
+        {
+          model: db.Household,
+          where: { apartment_id: apartmentId },
+          required: true,
+        },
+      ],
+    });
+    return humans;
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách cư dân:", error);
+    throw error;
+  }
+}
+
 async function getHumanByName(name, userId) {
+  let user = await authServices.findUserByID(userId);
   const apartmentId = await getApartmentByUser(userId);
-  return Human.findAll({
+  return db.Human.findAll({
     where: {
       name: {
         [Op.like]: `%${name}%`,
@@ -62,12 +87,12 @@ async function getHumanByName(name, userId) {
     },
     include: [
       {
-        model: Household,
+        model: db.Household,
         required: true,
         where: {
           apartment_id: apartmentId,
         },
-        attributes: ["id", "room", "apartment_id"],
+        attributes: ["id", "room", "apartment_id", "leave_date"],
       },
     ],
   });
@@ -79,5 +104,6 @@ export default {
   setLivingTrue,
   getAllByHousehold,
   getLivingByHousehold,
+  getAllHumansByApartmentId,
   getHumanByName,
 };

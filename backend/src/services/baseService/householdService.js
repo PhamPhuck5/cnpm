@@ -1,95 +1,112 @@
 import db from "../../models/index.js";
 import authServices from "./authServices.js";
-import { Op } from 'sequelize';
 
-async function createHousehold(room, number_motobike, number_car, start_date, userId, type, feePerMeter) {
+async function createHousehold(room, number_motorbike, number_car, start_date, userId) {
   let creator = await authServices.findUserByID(userId);
 
   const newHousehold = await db.Household.create({
+    apartment_id: creator.apartment_id,
     room,
-    number_motobike,
+    number_motorbike,
     number_car,
     start_date: start_date ? new Date(start_date) : new Date(),
-    apartment_id: creator.apartment_id,
-    type,
-    feePerMeter,
   });
 
   return newHousehold;
-}
+} //edited
 
-const getAllHouseholds = async (userId) => {
-  try {
-      let households = await db.Household.findAll({
-        order: [['createdAt', 'DESC']],
-        raw: false,  // <--- Thêm dòng này để chắc chắn lấy dữ liệu thô
-        nest: true 
-      });
-      return households;
-
-  } catch (error) {
-      console.log("Lỗi tại getAllHouseholds Service:", error);
-      throw error;
-  }
-};
-
-async function getHouseholdDetails(id) {
-  // return await db.Household.findOne({
-  //   where: { id },
-  //   include: [{ model: db.Apartment }, { model: db.Apartment }, { model: db.Human }],
-  // });
-
-  // if (household) {
-  //   // Chuyển đổi sang object thuần ở đây để an toàn
-  //   return household.get({ plain: true });
-  // }
-  // return null;
-  try{
-    let household = await db.Household.findOne({
-      where: { id },
-      include: [
-        { model: db.Apartment },
-        { model: db.Human }
-      ],
-      raw: false,
-      nest: true
-    });
-    return household.get({ plain: true });
-  } catch (error) {
-    console.log("Lỗi tại getHouseholdDetails Service:", error);
-    throw error;
-  }
-}
-
-async function getHouseholdByRoom(room, userId) {
+async function getAllHouseholds(userId) {
   const user = await db.User.findByPk(userId);
 
   return await db.Household.findAll({
     where: {
       apartment_id: user.apartment_id,
-      room: {
-        [Op.like]: `%${room}%`
-      },
+    },
+  });
+}
+async function findHouseholdById(id) {
+  return await db.Household.findOne({
+    where: { id },
+  });
+}
+async function getAllLivingHouseholds(userId) {
+  const user = await db.User.findByPk(userId);
+
+  return await db.Household.findAll({
+    where: {
+      apartment_id: user.apartment_id,
+      leave_date: null,
     },
     include: [
       {
-        model: db.Apartment,
-      },
-      {
-        model: db.Human,
-      },
-    ],
-    nest: true,
-    raw: false
+        model: db.Room,
+        on: {
+          col1: db.sequelize.where(
+            db.sequelize.col("Household.room"), "=",
+            db.sequelize.col("Room.room")
+          ),
+          col2: db.sequelize.where(
+            db.sequelize.col("Household.apartment_id"), "=",
+            db.sequelize.col("Room.apartment_id")
+          )
+        }
+      }
+    ]
   });
-}
+} //new
 
-export const findHouseholdByUser = getAllHouseholds;
+async function getHouseholdDetails(id) {
+  const household = await db.Household.findOne({
+    where: { id },
+    include: [
+      { model: db.Apartment }, 
+      { model: db.Human }
+    ],
+  });
+  if (!household) {
+    return null;
+  }
+
+  return household.get({ plain: true });
+} //edited
+
+async function getHouseholdsByRoom(room, userId) {
+  const user = await db.User.findByPk(userId);
+
+  return await db.Household.findAll({
+    where: {
+      apartment_id: user.apartment_id,
+      room: room,
+    },
+  });
+} //to controller
+
+async function getLivingHouseholdByRoom(room, userId) {
+  const user = await db.User.findByPk(userId);
+
+  return await db.Household.findOne({
+    where: {
+      apartment_id: user.apartment_id,
+      room: room,
+      leave_date: null,
+    },
+  });
+} //new
+
+async function onHouseholdStopLiving(room, userId, stopTime) {
+  const household = await getLivingHouseholdByRoom(room, userId);
+  household.leave_date = stopTime ? new Date(stopTime) : new Date();
+  await household.save();
+} //new
+
 const householdServices = {
   createHousehold: createHousehold,
   getAllHouseholds: getAllHouseholds,
   getHouseholdDetails: getHouseholdDetails,
-  findHouseholdByUser: findHouseholdByUser,
-  getHouseholdByRoom: getHouseholdByRoom,
+  getHouseholdsByRoom: getHouseholdsByRoom,
+  getAllLivingHouseholds: getAllLivingHouseholds,
+  findHouseholdById: findHouseholdById,
+  getLivingHouseholdByRoom: getLivingHouseholdByRoom,
+  onHouseholdStopLiving: onHouseholdStopLiving,
 };
 export default householdServices;

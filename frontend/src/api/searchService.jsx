@@ -1,18 +1,21 @@
 import api from './axios';
 
-// 1. Tìm kiếm cư dân theo tên (Smart Search)
-// Backend: router.get("/api/humans/name/:name", ...);
-export const searchResidentsByName = (name) => {
+//tìm kiếm nhân khẩu theo tên
+export const getResidentsByName = (name) => {
     return api.get(`/api/humans/name/${name}`);
 };
 
-// 2. Tìm kiếm thông tin phòng (Smart Search)
-// Backend: router.get("/api/household/roomname/:name", ...);
-export const getHouseholdByRoom = (roomName) => {
-    return api.get(`/api/household/roomname/${roomName}`);
+//tìm kiếm hộ đang sống theo số phòng
+export const getLivingHouseholdByRoomName = (roomName) => {
+    return api.get(`/api/household/roomname/living/${roomName}`);
 };
 
-export const getResidentsByHouseholdId = (householdId) => {
+// Lấy tất cả nhân khẩu của 1 hộ (theo ID hộ)
+export const getHumansByHousehold = (householdId) => {
     return api.get(`/api/humans/household/${householdId}`);
 };
 
+// tìm kiếm các hộ theo lịch sử 
+export const getHouseholdHistory = () => {
+    return api.get('/api/households');
+};

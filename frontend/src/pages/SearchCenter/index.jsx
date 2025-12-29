@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { searchResidentsByName, getHouseholdByRoom, getResidentsByHouseholdId} from '../../api/searchService';
+import { 
+    getResidentsByName, 
+    getLivingHouseholdByRoomName, 
+    getHouseholdHistory,
+    getHumansByHousehold 
+} from '../../api/searchService';
 import ResidentResults from './components/ResidentResults';
 import RoomResults from './components/RoomResults';
 import ResidentDetailModal from './components/ResidentDetailModal';
 
 const SearchCenter = () => {
-    // State UI
-    const [searchMode, setSearchMode] = useState('resident'); // 'resident' | 'room'
+    // === STATE UI ===
+    const [searchMode, setSearchMode] = useState('room_current'); // 'resident' | 'room_current' | 'room_history'
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
-    // State Data
+    // === STATE DATA ===
+    // 1. Kết quả tìm dân
     const [residentResults, setResidentResults] = useState([]);
     
-    // State Data cho Tìm Phòng (Cần 2 phần)
-    const [householdResult, setHouseholdResult] = useState(null);
+    // 2. Kết quả tìm phòng (Dùng chung cho cả Hiện tại và Lịch sử)
+    // Nếu Hiện tại: mảng có 1 phần tử. Nếu Lịch sử: mảng nhiều phần tử.
+    const [roomResults, setRoomResults] = useState([]);
+    
+    // 3. Dữ liệu cư dân của phòng (Chỉ dùng khi xem chi tiết 1 phòng cụ thể)
     const [roomResidents, setRoomResidents] = useState([]);
 
-    // State Modal
+    // === STATE MODAL ===
     const [selectedResident, setSelectedResident] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,39 +40,48 @@ const SearchCenter = () => {
         
         // Reset data cũ
         setResidentResults([]);
-        setHouseholdResult(null);
+        setRoomResults([]);
         setRoomResidents([]);
 
         try {
             if (searchMode === 'resident') {
-                // 1. TÌM THEO TÊN
-                const res = await searchResidentsByName(query);
-                // Backend trả về mảng humans trực tiếp hoặc trong res.data
+                // --- CASE 1: TÌM CƯ DÂN ---
+                const res = await getResidentsByName(query);
                 const data = res.data?.data || res.data || [];
                 setResidentResults(Array.isArray(data) ? data : []);
-            } else {
-                // 2. TÌM THEO SỐ PHÒNG
-                // Bước A: Tìm thông tin hộ khẩu
-                const res = await getHouseholdByRoom(query);
-                const responseData = res.data?.data || res.data || [];
-                const households = Array.isArray(responseData) ? responseData : [];
+            } 
+            else if (searchMode === 'room_current') {
+                // --- CASE 2: TÌM PHÒNG HIỆN TẠI ---
+                const res = await getLivingHouseholdByRoomName(query);
+                const data = res.data?.data || res.data;
                 
-                if (households.length > 0) {
-                    // Lấy hộ khẩu mới nhất (phần tử đầu tiên hoặc logic sort date)
-                    const activeHousehold = households[0]; 
-                    setHouseholdResult(activeHousehold);
-
-                    // Bước B: Gọi tiếp API lấy danh sách người trong hộ này
-                    if (activeHousehold.id) {
-                        const humanRes = await getResidentsByHouseholdId(activeHousehold.id);
-                        const humanData = humanRes.data?.data || humanRes.data || [];
-                        setRoomResidents(humanData);
+                if (data) {
+                    setRoomResults([data]); // Đưa vào mảng để đồng bộ format
+                    // Tự động tải danh sách dân của phòng này luôn
+                    if(data.id) {
+                        const humanRes = await getHumansByHousehold(data.id);
+                        setRoomResidents(humanRes.data?.data || humanRes.data || []);
                     }
                 }
+            } 
+            else if (searchMode === 'room_history') {
+                // --- CASE 3: TÌM LỊCH SỬ PHÒNG ---
+                const res = await getHouseholdHistory();
+                const allHouseholds = res.data?.data || res.data || [];
+                
+                // Frontend Filter: Lọc theo số phòng
+                const historyList = allHouseholds.filter(
+                    h => h.room && h.room.toString().toLowerCase() === query.trim().toLowerCase()
+                );
+
+                // Sort: Mới nhất lên đầu
+                historyList.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+                
+                setRoomResults(historyList);
             }
         } catch (error) {
             console.error("Lỗi tìm kiếm:", error);
-            // Có thể thêm Toast báo lỗi ở đây
+            // Có thể thêm Toast error tại đây
         } finally {
             setLoading(false);
         }
@@ -71,19 +89,18 @@ const SearchCenter = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">🔍 Tra Cứu Thông Tin</h1>
-                <p className="text-gray-500 mt-2 text-sm">Hệ thống tìm kiếm Cư dân & Căn hộ tập trung</p>
+            <div className="mb-8 text-center">
+                <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">🔍 Tra Cứu Thông Tin</h1>
+                <p className="text-gray-500 mt-2 text-sm">Hệ thống quản lý cư dân tập trung</p>
             </div>
 
             {/* Form Tìm Kiếm */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 mb-8 max-w-4xl mx-auto">
                 <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                     <div className="md:w-1/3">
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Loại tìm kiếm</label>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Chế độ tìm kiếm</label>
                         <select 
-                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 font-medium"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium"
                             value={searchMode}
                             onChange={(e) => {
                                 setSearchMode(e.target.value);
@@ -91,18 +108,21 @@ const SearchCenter = () => {
                                 setQuery('');
                             }}
                         >
-                            <option value="resident">👤 Tìm theo Tên Cư Dân</option>
-                            <option value="room">🏠 Tìm theo Số Phòng</option>
+                            <option value="room_current">Phòng</option>
+                            <option value="room_history">Lịch sử</option>
+                            <option value="resident">Tên Cư Dân</option>
                         </select>
                     </div>
 
                     <div className="md:w-2/3 flex gap-2 items-end">
                         <div className="flex-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Từ khóa</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                                {searchMode === 'resident' ? 'Nhập tên cư dân' : 'Nhập số phòng'}
+                            </label>
                             <input 
                                 type="text"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-400"
-                                placeholder={searchMode === 'resident' ? "Ví dụ: Nguyễn Văn A..." : "Ví dụ: 301, 12A..."}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                                placeholder={searchMode === 'resident' ? "VD: Nguyễn Văn A..." : "VD: 101, P302..."}
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                             />
@@ -110,21 +130,18 @@ const SearchCenter = () => {
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg shadow-blue-500/30 flex items-center disabled:opacity-70"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md flex items-center gap-2 disabled:opacity-70"
                         >
-                            {loading ? <span className="animate-spin mr-2">⚪</span> : 'Tìm'}
+                            {loading && <span className="animate-spin">⚪</span>} Tìm
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Kết quả */}
-            <div className="max-w-6xl mx-auto">
+            {/* Khu vực hiển thị kết quả */}
+            <div className="max-w-5xl mx-auto">
                 {loading ? (
-                    <div className="flex flex-col items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                        <p className="text-gray-500">Đang truy xuất dữ liệu...</p>
-                    </div>
+                    <div className="text-center py-12 text-gray-500">Đang truy xuất dữ liệu...</div>
                 ) : hasSearched ? (
                     searchMode === 'resident' ? (
                         <ResidentResults 
@@ -136,21 +153,20 @@ const SearchCenter = () => {
                         />
                     ) : (
                         <RoomResults 
-                            householdData={householdResult} 
-                            residentsData={roomResidents} 
+                            data={roomResults} 
+                            residents={roomResidents} 
+                            mode={searchMode} // Truyền mode xuống để RoomResults biết cách hiển thị
                         />
                     )
                 ) : (
-                    // Màn hình Welcome
-                    <div className="text-center py-20 opacity-60">
-                        <div className="text-6xl mb-4 grayscale">🏙️</div>
-                        <h3 className="text-xl font-medium text-gray-600">Sẵn sàng tra cứu</h3>
-                        <p className="text-sm text-gray-400 mt-2">Nhập thông tin để tìm kiếm hồ sơ từ hệ thống</p>
+                    <div className="text-center py-20 opacity-50">
+                        <div className="text-6xl mb-4 grayscale">🏢</div>
+                        <p className="text-gray-500">Nhập thông tin để bắt đầu tra cứu</p>
                     </div>
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Modal Chi tiết Cư dân */}
             <ResidentDetailModal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 

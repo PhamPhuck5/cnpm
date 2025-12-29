@@ -3,13 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../api/authService';
 
 const Register = () => {
-    // Giá trị mặc định apartmentId = 1 để khớp với dữ liệu bạn vừa seed
     const [formData, setFormData] = useState({
         name: '', 
         email: '', 
         password: '', 
         phonenumber: '', 
-        apartmentId: '1' 
+        // 👇 LƯU Ý: Đặt mặc định là 3 (theo ảnh Postman bạn gửi). 
+        // Nếu bạn xóa DB làm lại từ đầu thì hãy đổi về 1.
+        apartmentId: '3' 
     });
     
     const [loading, setLoading] = useState(false);
@@ -29,16 +30,15 @@ const Register = () => {
 
         try {
             // Chuẩn bị dữ liệu gửi đi
-            // Lưu ý: Backend dùng cột 'apartment_id', nên ta map lại cho chắc chắn
             const payload = {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
                 phonenumber: formData.phonenumber,
-                apartment_id: formData.apartmentId // Quan trọng: Mapping sang snake_case
+                apartmentId: parseInt(formData.apartmentId) 
             };
 
-            console.log("Đang gửi đăng ký:", payload); // Log để debug nếu lỗi
+            console.log("Đang gửi đăng ký:", payload);
 
             await register(payload);
             
@@ -47,8 +47,9 @@ const Register = () => {
 
         } catch (err) {
             console.error("Lỗi đăng ký:", err);
+            // Lấy thông báo lỗi chi tiết từ Backend trả về
             const message = err.response?.data?.message || err.message || "Lỗi server";
-            alert("❌ Lỗi: " + message);
+            alert("❌ Đăng ký thất bại: " + message);
         } finally {
             setLoading(false);
         }
@@ -56,10 +57,10 @@ const Register = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-96 border border-gray-200">
+            <div className="bg-white p-8 rounded-xl shadow-lg w-96 border border-gray-200 animate-fade-in-up">
                 <div className="text-center mb-6">
                     <h1 className="text-3xl font-bold text-blue-800">BlueMoon</h1>
-                    <p className="text-gray-500 text-sm mt-1">Đăng ký tài khoản admin</p>
+                    <p className="text-gray-500 text-sm mt-1">Đăng ký Quản trị viên</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,7 +82,7 @@ const Register = () => {
                         <input 
                             name="email"
                             type="email" 
-                            placeholder="email@example.com" 
+                            placeholder="admin@bluemoon.com" 
                             required 
                             className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             onChange={handleChange}
@@ -103,17 +104,19 @@ const Register = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">ID Tòa nhà</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">ID Tòa nhà (Apartment ID)</label>
                         <input 
                             name="apartmentId"
                             type="number" 
-                            placeholder="Nhập ID (VD: 1)" 
-                            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50"
+                            placeholder="Nhập ID chung cư" 
+                            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-yellow-50 font-bold text-blue-800"
                             onChange={handleChange}
                             value={formData.apartmentId}
                             required
                         />
-                        <p className="text-xs text-gray-400 mt-1">*Mặc định là 1 (Căn hộ mẫu)</p>
+                        <p className="text-xs text-gray-500 mt-1 italic">
+                            *Nhập đúng ID tòa nhà bạn đã tạo (Ví dụ: 3)
+                        </p>
                     </div>
 
                     <div>
@@ -132,15 +135,15 @@ const Register = () => {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className={`w-full text-white p-2.5 rounded-lg font-bold transition duration-200 mt-2
-                            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-md'}`}
+                        className={`w-full text-white p-2.5 rounded-lg font-bold transition duration-200 mt-4 shadow-lg
+                            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 hover:-translate-y-1'}`}
                     >
-                        {loading ? "Đang đăng ký..." : "Đăng Ký"}
+                        {loading ? "Đang xử lý..." : "Đăng Ký Tài Khoản"}
                     </button>
                 </form>
 
                 <div className="mt-6 text-center text-sm text-gray-600">
-                    Đã có tài khoản? <Link to="/login" className="text-blue-600 font-semibold hover:underline">Đăng nhập</Link>
+                    Đã có tài khoản? <Link to="/login" className="text-blue-600 font-semibold hover:underline">Đăng nhập ngay</Link>
                 </div>
             </div>
         </div>

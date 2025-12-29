@@ -1,8 +1,10 @@
+// models/user.js
 import { Model, DataTypes } from "sequelize";
 
 export default (sequelize) => {
   class Bill extends Model {
     static associate(models) {
+      // define association here
       this.belongsTo(models.User, {
         foreignKey: "user_create",
       });
@@ -14,7 +16,15 @@ export default (sequelize) => {
       });
     }
   }
-
+  /**
+  currently, base have these type:
+  NONE: "none",
+  voluntary: "voluntary",
+  fixed: "fixed",
+  motorcycle: "motorcycle",
+  car: "car",
+  area: "area",
+   */
   Bill.init(
     {
       name: {

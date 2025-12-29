@@ -5,11 +5,7 @@ async function createHuman(req, res) {
   try {
     const { household_id, name, phonenumber, email, dateOfBirth, role } = req.body;
 
-    const finalEmail = email === "" ? null : email;
-
-    const finalPhone = phonenumber === "" ? null : phonenumber;
-
-    const human = await humanService.createHuman(household_id, name, finalPhone, finalEmail, dateOfBirth, role);
+    const human = await humanService.createHuman(household_id, name, phonenumber, email, dateOfBirth, role);
 
     return res.status(201).json(human);
   } catch (error) {
@@ -52,7 +48,18 @@ async function getAllByHousehold(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+async function getAllInApartment(req, res) {
+  try {
+    const userId = req.user.id;
 
+    const humans = await humanService.getAllHumansByApartmentId(userId);
+
+    return res.json(humans);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+}
 async function getByName(req, res) {
   try {
     const { name } = req.params;
@@ -60,7 +67,7 @@ async function getByName(req, res) {
 
     const humans = await humanService.getHumanByName(name, userId);
 
-    return res.json({data: humans});
+    return res.json(humans);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -82,6 +89,7 @@ export default {
   createHuman,
   setLivingFalse,
   setLivingTrue,
+  getAllInApartment,
   getAllByHousehold,
   getLivingByHousehold,
   getByName,

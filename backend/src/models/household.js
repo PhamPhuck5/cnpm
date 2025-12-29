@@ -14,6 +14,14 @@ export default (sequelize) => {
       this.belongsTo(models.Apartment, {
         foreignKey: "apartment_id",
       });
+      this.belongsTo(models.Room, {
+        foreignKey: "room",
+        targetKey: "room",
+        scope: {
+          apartment_id: sequelize.col("Household.apartment_id"),
+        },
+        constraints: false, // turn of sequelize check pk constrain Sequelize
+      });
     }
   }
 
@@ -24,34 +32,26 @@ export default (sequelize) => {
         allowNull: false,
       },
       room: {
-        //todo: add index this and apartment_id
         type: DataTypes.STRING(8),
         allowNull: false,
       },
-      type: {
-        type: DataTypes.STRING(32),
+
+      start_date: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
-      area: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0.0,
+      leave_date: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
       },
-      feePerMeter: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      number_motobike: {
+      number_motorbike: {
         type: DataTypes.TINYINT,
         allowNull: true,
       },
       number_car: {
         type: DataTypes.TINYINT,
         allowNull: true,
-      },
-      start_date: {
-        type: DataTypes.DATE,
-        allowNull: false,
       },
     },
     {

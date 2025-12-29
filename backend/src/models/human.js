@@ -7,7 +7,7 @@ export default (sequelize) => {
       this.belongsTo(models.Household, {
         foreignKey: "household_id",
       });
-      this.hasMany(models.Absent, {
+      this.hasMany(models.ResidenceRecord, {
         foreignKey: "humanId",
       });
     }
@@ -22,6 +22,10 @@ export default (sequelize) => {
       name: {
         type: DataTypes.STRING(32),
         allowNull: false,
+      },
+      identity: {
+        type: DataTypes.STRING(12),
+        allowNull: true,
       },
       phonenumber: {
         type: DataTypes.CHAR(11),

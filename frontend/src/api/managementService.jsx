@@ -1,75 +1,85 @@
 import api from './axios';
 
-// ==================== CĂN HỘ (Apartment) ====================
-// 1. Tạo căn hộ mới (Cấu trúc toà nhà)
-export const createApartment = (data) => {
-    return api.post('/api/apartments', data);
+// ==================== 1. CĂN HỘ (Apartment) ====================
+export const getApartmentByUser = () => {
+    return api.get('/api/apartment');
 };
 
-// 2. Lấy danh sách tất cả căn hộ
 export const getAllApartments = () => {
     return api.get('/api/apartments');
 };
 
-// ==================== HỘ KHẨU (Household) ====================
-// 3. Tạo hộ khẩu mới (Thêm người vào ở)
+export const createApartment = (data) => {
+    return api.post('/api/apartments', data);
+};
+
+// ==================== 2. PHÒNG (Room - Mới) ====================
+export const getAllRooms = () => {
+    return api.get('/api/room/all');
+};
+
+export const getEmptyRooms = () => {
+    return api.get('/api/room/empty');
+};
+
+export const getOccupiedRooms = () => {
+    return api.get('/api/room/occupied');
+};
+
+// ==================== 3. HỘ KHẨU (Household) ====================
+// Tạo hộ khẩu mới
 export const createHousehold = (data) => {
     return api.post('/api/households/create', data);
 };
 
-// 4. Lấy danh sách hộ khẩu
-export const getAllHouseholds = () => {
-    return api.get('/api/households');
+// Lấy danh sách các hộ ĐANG SỐNG
+export const getLivingHouseholds = () => {
+    return api.get('/api/households/living');
 };
 
-// 5. Lấy chi tiết hộ khẩu
+// Lấy chi tiết hộ khẩu
 export const getHouseholdDetail = (id) => {
     return api.get(`/api/households/${id}`);
 };
 
-// ==================== CƯ DÂN (Resident/Human) ====================
-// 6. Thêm nhân khẩu mới
+// Chuyển đi cả hộ (Stop Living)
+export const stopLivingHousehold = (data) => {
+    // data: { room: "P101", stopTime: "2023-12-31" }
+    return api.put('/api/households/stop-living', data);
+};
+
+// ==================== 4. CƯ DÂN (Human) ====================
+// Thêm nhân khẩu mới vào hộ
 export const addResident = (data) => {
     return api.post('/api/humans', data);
 };
 
-// 7. Lấy tất cả lịch sử cư dân của 1 hộ
-export const getAllResidentsInHousehold = (householdId) => {
-    return api.get(`/api/humans/household/${householdId}`);
-};
-
-// 8. Chỉ lấy cư dân ĐANG Ở (Living)
-export const getLivingResidents = (householdId) => {
-    return api.get(`/api/humans/household/${householdId}/living`);
-};
-
-// 9. Báo quay lại sinh sống
+// Set trạng thái: Đang ở (Living)
 export const markAsLiving = (humanId) => {
     return api.patch(`/api/humans/${humanId}/status/living`);
 };
 
-// 10. Báo chuyển đi/Rời đi
+// Set trạng thái: Đã rời đi (Leave)
 export const markAsLeave = (humanId) => {
     return api.patch(`/api/humans/${humanId}/status/leave`);
 };
 
-// ==================== TẠM VẮNG (Absent) ====================
-// 11. Đăng ký tạm vắng
-export const registerAbsent = (data) => {
-    return api.post('/api/absents', data);
+// Lấy tất cả nhân khẩu trong tòa nhà (của User đang login)
+export const getAllHumansInApartment = () => {
+    return api.get('/api/humans/household/');
 };
 
-// 12. Lấy danh sách tạm vắng theo hộ
-export const getAbsentsByHousehold = (householdId) => {
-    return api.get(`/api/absents/household/${householdId}`);
+// ==================== 5. QUẢN LÝ TẠM VẮNG/LƯU TRÚ (Resident Record) ====================
+// Lưu ý: Backend đã đổi từ /api/absents sang /api/records
+
+// Tạo bản ghi (Tạm vắng/Tạm trú)
+export const createRecord = (data) => {
+    // data: { humanId, start_date, last_date, isAbsent: true/false }
+    return api.post('/api/records', data);
 };
 
-// 13. Lọc tạm vắng (Filter)
-export const filterAbsents = (householdId) => {
-    return api.get(`/api/absents/household/${householdId}/filter`);
-};
-
-// 14. Kết thúc tạm vắng
-export const endAbsent = (data) => {
-    return api.post('/api/absents/end', data);
+// Kết thúc bản ghi (Về sớm hơn dự kiến)
+export const endRecord = (data) => {
+    // data: { record_id, last_date }
+    return api.post('/api/records/end', data);
 };

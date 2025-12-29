@@ -3,75 +3,47 @@ import { fn, col } from "sequelize";
 
 import householdServices from "./householdService.js";
 import { findBillByID } from "./billService.js";
-import { paymentStrategies } from "../../utils/getPaymentValue.js";
-import { findHouseholdByUser } from "./householdService.js";
+import { BILL_BASE, calculateRequiredAmount } from "../../utils/getPaymentValue.js";
 
 async function createPayment(bill_id, amount, collector, householdId) {
+  const bill = await findBillByID(bill_id);
+  const household = await householdServices.findHouseholdById(householdId);
+
   return await db.Payment.create({
     household_id: householdId,
     bill_id: bill_id,
     date: new Date(),
     amount: amount,
+    require: calculateRequiredAmount(bill, household),
     collector: collector,
   });
+} //edited
+
+async function updatePayment(paymentId, payload, userId) {
+  const payment = await db.Payment.findByPk(paymentId);
+  if (!payment) {
+    throw new Error("Payment not found");
+  }
+  const bill = await findBillByID(payment.bill_id);
+  if (bill.based != BILL_BASE.NONE && payload.require) {
+    throw new Error("can not update new require for this payment in this bill");
+  }
+  return await payment.update({
+    date: new Date(),
+    amount: payload.amount ?? payment.amount,
+    require: payload.require ?? payment.require,
+    collector: payload.amount ? userId : payment.collector,
+  });
 }
 
-async function getPaymentForBill(bill_id) {
+async function getPaidStatusByBill(bill_id) {
   const bill = await findBillByID(bill_id);
-  const paymentsSummary = await db.Payment.findAll({
+  return await db.Payment.findAll({
     where: { bill_id },
-    attributes: ["household_id", [fn("SUM", col("Payment.amount")), "paidAmount"]],
-    include: [
-      {
-        model: db.Household,
-        attributes: ["number_car", "number_motobike", "area", "feePerMeter"],
-      },
-    ],
-    group: ["household_id", "Household.id"],
-    order: [["household_id", "ASC"]],
+    include: [{ model: db.Household }, { model: db.Bill }],
     raw: true,
+    nest: true,
   });
-  const result = paymentsSummary.map((row) => {
-    const requiredAmount = calculateRequiredAmount(bill, row);
-    let remaining = requiredAmount - row.paidAmount;
-    if (remaining < 0) remaining = 0;
-    return {
-      household_id: row.household_id,
-      paidAmount: Number(row.paidAmount),
-      requiredAmount,
-      remaining: remaining,
-    };
-  });
-  return result;
-}
-
-async function getPaidStatusByBill(bill_id, userId) {
-  const bill = await findBillByID(bill_id, userId);
-  const households = await findHouseholdByUser(userId);
-
-  const payments = await db.Payment.findAll({
-    where: { bill_id: bill_id },
-    attributes: ["household_id", [fn("SUM", col("amount")), "paidAmount"]],
-    group: ["household_id"],
-    raw: true,
-  });
-
-  const paymentMap = new Map(payments.map((p) => [p.household_id, Number(p.paidAmount)]));
-
-  const result = households.map((household) => {
-    const requiredAmount = calculateRequiredAmount(bill, household);
-    const paidAmount = paymentMap.get(household.id) ?? 0;
-    let remaining = requiredAmount - paidAmount;
-    if (remaining < 0) remaining = 0;
-    return {
-      household_id: household.id,
-      paidAmount,
-      requiredAmount,
-      remaining: remaining,
-    };
-  });
-
-  return result;
 }
 
 async function getStatsByBill(bill_id) {
@@ -80,24 +52,17 @@ async function getStatsByBill(bill_id) {
     attributes: [
       [db.sequelize.fn("SUM", db.sequelize.col("amount")), "totalCollected"],
       [db.sequelize.fn("COUNT", db.sequelize.col("id")), "totalPayments"],
+      [db.sequelize.fn("SUM", db.sequelize.col("Payment.require")), "totalRequire"],
     ],
     raw: true,
   });
+  console.log(payments);
   return payments[0];
 }
 
-const calculateRequiredAmount = (bill, household) => {
-  if (!bill.based) return bill.amount ?? 0;
-
-  const strategy = paymentStrategies[bill.based];
-  if (!strategy) return 0;
-
-  return strategy(bill.amount, household);
-};
-
 const paymentServices = {
   createPayment: createPayment,
-  getPaymentForBill: getPaymentForBill,
+  updatePayment: updatePayment,
   getStatsByBill: getStatsByBill,
   getPaidStatusByBill: getPaidStatusByBill,
 };

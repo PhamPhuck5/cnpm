@@ -7,6 +7,7 @@ export default {
     password: process.env.DB_PASSWORD,
     database: "database_development",
     host: "127.0.0.1",
+    port: 3307,
     dialect: "mysql",
     logging: false,
     dialectOptions: {
@@ -14,10 +15,11 @@ export default {
     },
   },
   test: {
-    username: "root",
+    username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: "cnpm_test_db",
+    database: "cnpm_db",
     host: "127.0.0.1",
+    port: 3307,
     dialect: "mysql",
     logging: false,
     dialectOptions: {
@@ -27,7 +29,7 @@ export default {
   production: {
     username: "root",
     password: process.env.DB_PASSWORD,
-    database: "test_db",
+    database: "production_db",
     host: "127.0.0.1",
     dialect: "mysql",
     dialectOptions: {
@@ -37,4 +39,5 @@ export default {
 };
 export const CONFIG_VALUE = {
   MAX_TASK_LENGTH_MINUTES: 23 * 60,
+  SEEDER_APARTMENT_ID: 1,
 };

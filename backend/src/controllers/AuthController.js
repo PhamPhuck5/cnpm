@@ -45,6 +45,7 @@ let handleRegister = async (req, res) => {
       !newUserData.phonenumber ||
       !newUserData.email ||
       !newUserData.password ||
+      !newUserData.apartmentId ||
       // wrong type (avoid FE check)
       !authServices.requestIsLegit(newUserData.email, newUserData.password)
     ) {

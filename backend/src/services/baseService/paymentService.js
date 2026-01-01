@@ -25,7 +25,7 @@ async function updatePayment(paymentId, payload, userId) {
     throw new Error("Payment not found");
   }
   const bill = await findBillByID(payment.bill_id);
-  if (bill.based != BILL_BASE.NONE && payload.require) {
+  if (bill.based != BILL_BASE.NONE && bill.based != BILL_BASE.VOLUNTARY && payload.require) {
     throw new Error("can not update new require for this payment in this bill");
   }
   return await payment.update({

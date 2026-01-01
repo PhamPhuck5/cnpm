@@ -11,7 +11,7 @@ const CreateBill = () => {
             id: 'service_fee',
             label: 'Phí Dịch Vụ',
             icon: '🏢',
-            description: 'Tính theo đơn giá riêng của từng căn hộ (đã lưu trong Hợp đồng/Sổ đỏ).',
+            description: 'Tính theo đơn giá riêng của từng căn hộ.',
             apiBased: 'area', // Gửi xuống backend là 'area'
             defaultAmount: 0, // Gửi 0 để Backend tự lấy feePerMeter của hộ
             fixed: true, // Không cho Admin sửa giá

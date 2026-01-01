@@ -73,10 +73,46 @@ const handleGetBillById = async (req, res) => {
     });
   }
 };
+
+const handleDeleteBill = async (req, res) => {
+  try {
+    const { id } = req.params; // Lấy ID bill từ URL
+    const userId = req.user.id; // Lấy ID người dùng hiện tại (để check quyền)
+
+    if (!id) {
+      return res.status(400).json({ message: "Thiếu ID hóa đơn cần xóa" });
+    }
+
+    await billServices.deleteBill(id, userId);
+
+    return res.status(200).json({
+      message: "Xóa đợt thu thành công",
+    });
+
+  } catch (error) {
+    if (error.message === "not permission") {
+      return res.status(403).json({
+        message: "Bạn không có quyền xóa hóa đơn này (không cùng căn hộ)",
+      });
+    }
+    if (error.message === "not found bill or user") {
+      return res.status(404).json({
+        message: "Không tìm thấy đợt thu",
+      });
+    }
+    console.error("Error in handleDeleteBill:", error);
+    return res.status(500).json({
+      message: "Lỗi máy chủ nội bộ",
+      error: error.message,
+    });
+  }
+};
+
 const billController = {
   handleCreateBill,
   handleGetAllBillsOfApartment,
   handleGetBillById,
+  handleDeleteBill,
 };
 
 export default billController;

@@ -77,8 +77,9 @@ async function getAllHumansByApartmentId(userId) {
 }
 
 async function getHumanByName(name, userId) {
+  let user = await authServices.findUserByID(userId);
   const apartmentId = await getApartmentByUser(userId);
-  return Human.findAll({
+  return db.Human.findAll({
     where: {
       name: {
         [Op.like]: `%${name}%`,
@@ -91,7 +92,7 @@ async function getHumanByName(name, userId) {
         where: {
           apartment_id: apartmentId,
         },
-        attributes: ["id", "room", "apartment_id"],
+        attributes: ["id", "room", "apartment_id", "leave_date"],
       },
     ],
   });

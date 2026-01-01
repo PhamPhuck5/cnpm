@@ -8,6 +8,7 @@ let initBillRouter = (app) => {
   router.post("/api/bills", authMiddleware, billController.handleCreateBill);
   router.get("/api/bills/my-apartment", authMiddleware, billController.handleGetAllBillsOfApartment);
   router.get("/api/bills/:id", authMiddleware, billController.handleGetBillById);
+  router.delete("/api/bills/:id", authMiddleware, billController.handleDeleteBill);
 
   return app.use("/", router);
 };

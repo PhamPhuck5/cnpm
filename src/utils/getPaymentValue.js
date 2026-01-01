@@ -16,7 +16,15 @@ export const paymentStrategies = {
 
   [BILL_BASE.CAR]: (amount, household) => amount * household.number_car,
 
-  [BILL_BASE.AREA]: (amount, household) => household.area * household.feePerMeter,
+  [BILL_BASE.AREA]: (amount, household) => {
+    const area = household.Room?.area || household.area || 0;
+    const householdFee = household.Room?.feePerMeter || household.feePerMeter || 0;
+    const finalPrice = amount > 0 ? amount : householdFee;
+
+    console.log(`> Tính phí P.${household.Room?.room}: ${area}m2 x ${finalPrice}đ`);
+    
+    return finalPrice * area;
+  },
 
   [BILL_BASE.NONE]: (amount, household) => null,
 };

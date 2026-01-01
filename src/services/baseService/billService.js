@@ -27,10 +27,18 @@ async function createNewBill(creatorId, name, start_date, last_date, amount, bas
         apartment_id: creator.apartment_id,
         leave_date: null,
       },
+      include: [
+        {
+          model: db.Room,
+          attributes: ['area', 'room', 'feePerMeter'],
+          required: true,
+        }
+      ],
       transaction,
     });
 
     const paymentPromises = activeHouseholds.map((household) => {
+      console.log(`Hộ: ${household.id} | Phòng: ${household.Room?.room} | Giá riêng: ${household.Room?.feePerMeter}`);
       const requiredAmount = calculateRequiredAmount(newBill, household);
 
       return db.Payment.create(
@@ -97,12 +105,41 @@ async function getAllBillsOfApartment(userId) {
     order: [["start_date", "DESC"]],
   });
 
-  return bills;
+  return bills.map(bill => bill.get({ plain: true }));
 }
+
+async function deleteBill(billId, userId) {
+  const hasPermission = await checkPermission(billId, userId);
+  if (!hasPermission) {
+    throw new Error("User does not have permission to delete this bill");
+  }
+
+  const transaction = await db.sequelize.transaction();
+  try {
+    await db.Payment.destroy({
+      where: { bill_id: billId },
+      transaction,
+    });
+
+    await db.Bill.destroy({
+      where: { id: billId },
+      transaction,
+    });
+
+    await transaction.commit();
+    return true;
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error deleting bill and associated payments:", error);
+    throw error;
+  }
+}
+
 const billServices = {
   createNewBill: createNewBill,
   getAllBillsOfApartment: getAllBillsOfApartment,
   checkPermission: checkPermission,
   findBillByID,
+  deleteBill,
 };
 export default billServices;

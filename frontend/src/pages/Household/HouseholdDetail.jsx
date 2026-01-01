@@ -276,8 +276,11 @@ const HouseholdDetail = () => {
                                 value={addFormData.phonenumber} onChange={e => setAddFormData({...addFormData, phonenumber: e.target.value})} />
                             <input type="email" className="w-full border p-2 rounded" placeholder="Email"
                                 value={addFormData.email} onChange={e => setAddFormData({...addFormData, email: e.target.value})} />
-                            <input required type="date" className="w-full border p-2 rounded" 
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Ngày sinh <span className="text-red-500">*</span></label>
+                                <input required type="date" className="w-full border p-2 rounded" 
                                 value={addFormData.dateOfBirth} onChange={e => setAddFormData({...addFormData, dateOfBirth: e.target.value})} />
+                            </div>
                             <select className="w-full border p-2 rounded bg-white"
                                 value={addFormData.role} onChange={e => setAddFormData({...addFormData, role: e.target.value})}>
                                 <option value="Thành viên">Thành viên</option>

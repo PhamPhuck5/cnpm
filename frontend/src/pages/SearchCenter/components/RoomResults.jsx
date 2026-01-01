@@ -54,14 +54,10 @@ const RoomResults = ({ data, residents, mode }) => {
                         </span>
                     </div>
                     
-                    <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-gray-100">
+                    <div className="p-6 grid grid-cols-2 md:grid-cols-3 gap-6 text-center divide-x divide-gray-100">
                         <div>
                             <p className="text-gray-400 text-xs uppercase font-bold mb-1">Chủ hộ</p>
                             <p className="font-bold text-gray-800 truncate">{residents.find(r => r.role === 'Chủ hộ')?.name || "---"}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-400 text-xs uppercase font-bold mb-1">Diện tích</p>
-                            <p className="font-bold text-gray-800">{household.area || 0} m²</p>
                         </div>
                         <div>
                             <p className="text-gray-400 text-xs uppercase font-bold mb-1">Phương tiện</p>

@@ -27,8 +27,8 @@ export default {
   production: {
     username: "root",
     password: process.env.DB_PASSWORD,
-    database: "test_db",
-    host: "127.0.0.1",
+    database: "cnpm",
+    host: "host.docker.internal",
     dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,

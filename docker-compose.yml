@@ -7,8 +7,7 @@ services:
       - "3003:3003"
     env_file:
       - .env
-    environment:
-      - REDIS_URL=redis://redis:6379
+
 
 
 

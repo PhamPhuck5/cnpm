@@ -2,6 +2,7 @@ import authServices from "../services/baseService/authServices.js";
 
 let handleLoggin = async (req, res) => {
   try {
+    console.log("Check Body nhận được:", req.body);
     let email = req.body.email;
     let password = req.body.password;
 
@@ -44,6 +45,7 @@ let handleRegister = async (req, res) => {
       !newUserData.phonenumber ||
       !newUserData.email ||
       !newUserData.password ||
+      !newUserData.apartmentId ||
       // wrong type (avoid FE check)
       !authServices.requestIsLegit(newUserData.email, newUserData.password)
     ) {

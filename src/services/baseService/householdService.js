@@ -37,14 +37,37 @@ async function getAllLivingHouseholds(userId) {
       apartment_id: user.apartment_id,
       leave_date: null,
     },
+    include: [
+      {
+        model: db.Room,
+        on: {
+          col1: db.sequelize.where(
+            db.sequelize.col("Household.room"), "=",
+            db.sequelize.col("Room.room")
+          ),
+          col2: db.sequelize.where(
+            db.sequelize.col("Household.apartment_id"), "=",
+            db.sequelize.col("Room.apartment_id")
+          )
+        }
+      }
+    ]
   });
 } //new
 
 async function getHouseholdDetails(id) {
-  return await db.Household.findOne({
+  const household = await db.Household.findOne({
     where: { id },
-    include: [{ model: db.Apartment }, { model: db.Human }],
+    include: [
+      { model: db.Apartment }, 
+      { model: db.Human }
+    ],
   });
+  if (!household) {
+    return null;
+  }
+
+  return household.get({ plain: true });
 } //edited
 
 async function getHouseholdsByRoom(room, userId) {

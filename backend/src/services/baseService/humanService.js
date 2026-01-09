@@ -4,18 +4,30 @@ import { getApartmentByUser } from "./apartmentService.js";
 import authServices from "./authServices.js";
 import { Op } from "sequelize";
 
-async function createHuman(household_id, name, phonenumber, email, dateOfBirth, role, living = true) {
+async function createHuman(household_id, name, identity, phonenumber, email, dateOfBirth, role, living = true, stay_type, start_date, end_date) {
+  const finalStayType = stay_type || 'Thường trú';
+  
+  let finalStartDate = start_date;
+  let finalEndDate = end_date;
+
+  if (finalStayType === 'Thường trú') {
+    finalStartDate = start_date || new Date();
+    finalEndDate = null;
+  }
   return await db.Human.create({
     household_id,
     name,
+    identity,
     phonenumber,
     email,
     dateOfBirth,
     role,
     living,
+    stay_type: finalStayType,
+    start_date: finalStartDate,
+    end_date: finalEndDate,
   });
 }
-
 async function setLivingFalse(humanId) {
   return await db.Human.update(
     {

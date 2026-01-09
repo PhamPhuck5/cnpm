@@ -55,6 +55,19 @@ export default (sequelize) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
+      stay_type: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        defaultValue: 'Thường trú' 
+      },
+      start_date: {
+        type: DataTypes.DATEONLY, 
+        allowNull: true,          
+      },
+      end_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,         
+      }
     },
     {
       sequelize,

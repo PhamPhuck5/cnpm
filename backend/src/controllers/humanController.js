@@ -3,9 +3,32 @@ import humanService from "../services/baseService/humanService.js";
 
 async function createHuman(req, res) {
   try {
-    const { household_id, name, phonenumber, email, dateOfBirth, role } = req.body;
+    const { 
+      household_id, 
+      name, 
+      identity, 
+      phonenumber, 
+      email, 
+      dateOfBirth, 
+      role,
+      stay_type,  
+      start_date, 
+      end_date    
+    } = req.body;
 
-    const human = await humanService.createHuman(household_id, name, phonenumber, email, dateOfBirth, role);
+    const human = await humanService.createHuman(
+      household_id, 
+      name, 
+      identity, 
+      phonenumber, 
+      email, 
+      dateOfBirth, 
+      role, 
+      true, 
+      stay_type,
+      start_date, 
+      end_date
+    );
 
     return res.status(201).json(human);
   } catch (error) {

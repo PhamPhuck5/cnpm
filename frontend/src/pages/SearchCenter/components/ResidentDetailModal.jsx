@@ -51,7 +51,11 @@ const ResidentDetailModal = ({ isOpen, onClose, data }) => {
                             <p className="text-gray-500 mb-1">Số điện thoại</p>
                             <p className="font-semibold text-gray-800">{data.phonenumber || '---'}</p>
                         </div>
-                        <div className="col-span-2">
+                        <div className="col-span-2 md:col-span-1">
+                            <p className="text-gray-500 mb-1">CCCD/CMND</p>
+                            <p className="font-semibold text-gray-800">{data.identity || '---'}</p>
+                        </div>
+                        <div className="col-span-2 md:col-span-1">
                             <p className="text-gray-500 mb-1">Email</p>
                             <p className="font-semibold text-gray-800">{data.email || '---'}</p>
                         </div>
